@@ -5,6 +5,7 @@ import {
   TumblerLogo,
   OutestartLogo,
   WalletConnectLogo,
+  RobinhoodLogo,
 } from "./logo/TrustedByLogos";
 
 const logos = [
@@ -14,6 +15,7 @@ const logos = [
   TumblerLogo,
   OutestartLogo,
   WalletConnectLogo,
+  RobinhoodLogo,
 ];
 
 export const TrustedBy = () => {
