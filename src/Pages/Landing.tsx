@@ -10,7 +10,7 @@ import MeetOrion from "@/Components/MeetOrion";
 export default function Landing() {
   return (
     <>
-      <div className="min-h-screen min-w-full bg-background text-foreground">
+      <div className="min-h-screen w-full flex flex-col bg-background text-foreground overflow-x-hidden">
         <Navbar />
         <Hero />
         <TrustedBy />

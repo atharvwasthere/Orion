@@ -4,7 +4,7 @@ import { OrionLogo } from "@/Components/logo/orion-logo";
 export default function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex justify-center">
-      <nav className="mt-2 flex h-12 md:h-14 w-full max-w-7xl items-center justify-between rounded-lg bg-paper-soft/60 backdrop-blur-md px-4 transition-all">
+      <nav className="mt-2 flex h-12 md:h-14 w-full max-w-7xl items-center justify-between rounded-lg  backdrop-blur-md px-4 transition-all">
         {/* Left Section: Logo + Links */}
         <div className="flex items-center gap-8 ">
           <OrionLogo className="-mt-2" />
@@ -26,7 +26,7 @@ export default function Navbar() {
 
         {/* Right Section: Buttons */}
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="shadow-none bg-muted/10 font-medium rounded-none">
+          <Button variant="outline" size="sm" className="border-none shadow-none bg-transparent hover:bg-transparent font-medium rounded-none">
             Login
           </Button>
           <Button
