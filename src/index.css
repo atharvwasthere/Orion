@@ -1,0 +1,204 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    --font-display: "Playfair Display", "var(--font-space-grotesk)", sans-serif;
+}
+
+/* Updated color scheme to Solar Orange theme for Orion */
+:root {
+  --background: #fff8f1; /* Cream / Soft Peach */
+  --foreground: #1b1305; /* Dark Brown */
+  --card: #ffffff; /* Pure White */
+  --card-foreground: #1b1305; /* Dark Brown */
+  --popover: #ffffff; /* Pure White */
+  --popover-foreground: #1b1305; /* Dark Brown */
+  --primary: #ff7b00; /* Vivid Orange */
+  --primary-foreground: #fff3e4; /* Light Apricot */
+  --secondary: #fff8f1; /* Cream / Soft Peach */
+  --secondary-foreground: #1b1305; /* Dark Brown */
+  --muted: #fff3e4; /* Light Apricot */
+  --muted-foreground: #8b6f47; /* Muted Brown */
+  --accent: #ff9f1c; /* Warm Amber */
+  --accent-foreground: #1b1305; /* Dark Brown */
+  --destructive: oklch(0.577 0.245 27.325); /* Warm Red-Orange (OKLCH) */
+  --destructive-foreground: oklch(0.577 0.245 27.325); /* Same Warm Red-Orange */
+  /* --border: #ffe5cc; Pale Peach Border */
+  --input: #ffe5cc; /* Pale Peach Input */
+  --ring: #ff9f1c; /* Warm Amber Highlight */
+  --chart-1: #ff7b00; /* Vivid Orange */
+  --chart-2: #ff9f1c; /* Warm Amber */
+  --chart-3: #ffb84d; /* Soft Tangerine */
+  --chart-4: #ffc266; /* Light Orange */
+  --chart-5: #ffd699; /* Pale Orange */
+  --radius: 1rem; /* Rounded Corners */
+  --sidebar: #fff8f1; /* Cream / Soft Peach */
+  --sidebar-foreground: #1b1305; /* Dark Brown */
+  --sidebar-primary: #ff7b00; /* Vivid Orange */
+  --sidebar-primary-foreground: #fff3e4; /* Light Apricot */
+  --sidebar-accent: #fff3e4; /* Light Apricot */
+  --sidebar-accent-foreground: #1b1305; /* Dark Brown */
+  --sidebar-border: #ffe5cc; /* Pale Peach Border */
+  --sidebar-ring: #ff9f1c; /* Warm Amber */
+}
+
+
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-space-grotesk);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Added custom animations for geometric motion effects */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.8;
+    filter: brightness(1.2);
+  }
+}
+@keyframes ripple-energy {
+  0%, 100% {
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dashoffset: 2;
+  }
+}
+
+.animate-energy {
+  stroke-dasharray: 4 2;
+  animation: ripple-energy 0.35s ease-in-out infinite;
+}
+
+
+@keyframes wiggle-lines {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-0.5px);
+  }
+  50% {
+    transform: translateX(0.8px);
+  }
+  75% {
+    transform: translateX(-0.3px);
+  }
+}
+
+/* optional slight flicker for life-like energy */
+@keyframes flicker {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.2); }
+}
+
+.animate-wiggle-lines {
+  animation: wiggle-lines 0.25s ease-in-out infinite alternate,
+             flicker 1s ease-in-out infinite alternate;
+}
+
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  animation: marquee 25s linear infinite;
+}
+
+
+
+
+
+@keyframes slide-in {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.6s ease-out;
+}
