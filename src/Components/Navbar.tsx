@@ -1,5 +1,6 @@
 import { Button } from "@/Components/ui/button";
 import { OrionLogo } from "@/Components/logo/orion-logo";
+import { Link } from "@tanstack/react-router";
 
 export default function Navbar() {
   return (
@@ -15,10 +16,7 @@ export default function Navbar() {
             >
               Platform
             </a>
-            <a
-              href="#about"
-              className="hover:text-primary transition-colors"
-            >
+            <a href="#about" className="hover:text-primary transition-colors">
               About
             </a>
           </div>
@@ -26,14 +24,19 @@ export default function Navbar() {
 
         {/* Right Section: Buttons */}
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="border-none shadow-none bg-transparent hover:bg-transparent font-medium rounded-none">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-none shadow-none bg-transparent hover:bg-transparent font-medium rounded-none"
+          >
             Login
           </Button>
           <Button
+            
             size="sm"
             className="bg-primary hover:bg-primary/90 text-md text-primary-foreground font-medium rounded-none"
           >
-            Get access now
+            <Link to="/dashboard/setup">Get Access Now</Link>{" "}
           </Button>
         </div>
       </nav>

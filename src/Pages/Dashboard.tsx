@@ -123,7 +123,7 @@ export default function DashboardPage() {
             <h2 className="font-display text-xl font-semibold">Knowledge Base Summary</h2>
             <Button asChild className="bg-primary hover:bg-primary/90">
               <Link 
-              to="/dashboard/faq">Add FAQ</Link>            
+              to="/dashboard/faqs">Add FAQ</Link>            
             </Button>
           </div>
 

@@ -14,9 +14,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardSetupRouteImport } from './routes/dashboard/setup'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
-import { Route as DashboardFaqRouteImport } from './routes/dashboard/faq'
+import { Route as DashboardFaqsRouteImport } from './routes/dashboard/faqs'
 import { Route as DashboardEscalationsRouteImport } from './routes/dashboard/escalations'
-import { Route as DashboardConversationsRouteImport } from './routes/dashboard/conversations'
 import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard/analytics'
 import { Route as DashboardConversationsIndexRouteImport } from './routes/dashboard/conversations/index'
 import { Route as DashboardConversationsIdRouteImport } from './routes/dashboard/conversations/$id'
@@ -46,19 +45,14 @@ const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardFaqRoute = DashboardFaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
+const DashboardFaqsRoute = DashboardFaqsRouteImport.update({
+  id: '/faqs',
+  path: '/faqs',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardEscalationsRoute = DashboardEscalationsRouteImport.update({
   id: '/escalations',
   path: '/escalations',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
-const DashboardConversationsRoute = DashboardConversationsRouteImport.update({
-  id: '/conversations',
-  path: '/conversations',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
@@ -68,35 +62,34 @@ const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
 } as any)
 const DashboardConversationsIndexRoute =
   DashboardConversationsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardConversationsRoute,
+    id: '/conversations/',
+    path: '/conversations/',
+    getParentRoute: () => DashboardRouteRoute,
   } as any)
 const DashboardConversationsIdRoute =
   DashboardConversationsIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => DashboardConversationsRoute,
+    id: '/conversations/$id',
+    path: '/conversations/$id',
+    getParentRoute: () => DashboardRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
-  '/dashboard/conversations': typeof DashboardConversationsRouteWithChildren
   '/dashboard/escalations': typeof DashboardEscalationsRoute
-  '/dashboard/faq': typeof DashboardFaqRoute
+  '/dashboard/faqs': typeof DashboardFaqsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/setup': typeof DashboardSetupRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/conversations/$id': typeof DashboardConversationsIdRoute
-  '/dashboard/conversations/': typeof DashboardConversationsIndexRoute
+  '/dashboard/conversations': typeof DashboardConversationsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/escalations': typeof DashboardEscalationsRoute
-  '/dashboard/faq': typeof DashboardFaqRoute
+  '/dashboard/faqs': typeof DashboardFaqsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/setup': typeof DashboardSetupRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -108,9 +101,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
-  '/dashboard/conversations': typeof DashboardConversationsRouteWithChildren
   '/dashboard/escalations': typeof DashboardEscalationsRoute
-  '/dashboard/faq': typeof DashboardFaqRoute
+  '/dashboard/faqs': typeof DashboardFaqsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/setup': typeof DashboardSetupRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -123,20 +115,19 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/dashboard/analytics'
-    | '/dashboard/conversations'
     | '/dashboard/escalations'
-    | '/dashboard/faq'
+    | '/dashboard/faqs'
     | '/dashboard/settings'
     | '/dashboard/setup'
     | '/dashboard/'
     | '/dashboard/conversations/$id'
-    | '/dashboard/conversations/'
+    | '/dashboard/conversations'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard/analytics'
     | '/dashboard/escalations'
-    | '/dashboard/faq'
+    | '/dashboard/faqs'
     | '/dashboard/settings'
     | '/dashboard/setup'
     | '/dashboard'
@@ -147,9 +138,8 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/dashboard/analytics'
-    | '/dashboard/conversations'
     | '/dashboard/escalations'
-    | '/dashboard/faq'
+    | '/dashboard/faqs'
     | '/dashboard/settings'
     | '/dashboard/setup'
     | '/dashboard/'
@@ -199,11 +189,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/faq': {
-      id: '/dashboard/faq'
-      path: '/faq'
-      fullPath: '/dashboard/faq'
-      preLoaderRoute: typeof DashboardFaqRouteImport
+    '/dashboard/faqs': {
+      id: '/dashboard/faqs'
+      path: '/faqs'
+      fullPath: '/dashboard/faqs'
+      preLoaderRoute: typeof DashboardFaqsRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/escalations': {
@@ -211,13 +201,6 @@ declare module '@tanstack/react-router' {
       path: '/escalations'
       fullPath: '/dashboard/escalations'
       preLoaderRoute: typeof DashboardEscalationsRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/conversations': {
-      id: '/dashboard/conversations'
-      path: '/conversations'
-      fullPath: '/dashboard/conversations'
-      preLoaderRoute: typeof DashboardConversationsRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/analytics': {
@@ -229,55 +212,41 @@ declare module '@tanstack/react-router' {
     }
     '/dashboard/conversations/': {
       id: '/dashboard/conversations/'
-      path: '/'
-      fullPath: '/dashboard/conversations/'
+      path: '/conversations'
+      fullPath: '/dashboard/conversations'
       preLoaderRoute: typeof DashboardConversationsIndexRouteImport
-      parentRoute: typeof DashboardConversationsRoute
+      parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/conversations/$id': {
       id: '/dashboard/conversations/$id'
-      path: '/$id'
+      path: '/conversations/$id'
       fullPath: '/dashboard/conversations/$id'
       preLoaderRoute: typeof DashboardConversationsIdRouteImport
-      parentRoute: typeof DashboardConversationsRoute
+      parentRoute: typeof DashboardRouteRoute
     }
   }
 }
 
-interface DashboardConversationsRouteChildren {
+interface DashboardRouteRouteChildren {
+  DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
+  DashboardEscalationsRoute: typeof DashboardEscalationsRoute
+  DashboardFaqsRoute: typeof DashboardFaqsRoute
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardSetupRoute: typeof DashboardSetupRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardConversationsIdRoute: typeof DashboardConversationsIdRoute
   DashboardConversationsIndexRoute: typeof DashboardConversationsIndexRoute
 }
 
-const DashboardConversationsRouteChildren: DashboardConversationsRouteChildren =
-  {
-    DashboardConversationsIdRoute: DashboardConversationsIdRoute,
-    DashboardConversationsIndexRoute: DashboardConversationsIndexRoute,
-  }
-
-const DashboardConversationsRouteWithChildren =
-  DashboardConversationsRoute._addFileChildren(
-    DashboardConversationsRouteChildren,
-  )
-
-interface DashboardRouteRouteChildren {
-  DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
-  DashboardConversationsRoute: typeof DashboardConversationsRouteWithChildren
-  DashboardEscalationsRoute: typeof DashboardEscalationsRoute
-  DashboardFaqRoute: typeof DashboardFaqRoute
-  DashboardSettingsRoute: typeof DashboardSettingsRoute
-  DashboardSetupRoute: typeof DashboardSetupRoute
-  DashboardIndexRoute: typeof DashboardIndexRoute
-}
-
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
-  DashboardConversationsRoute: DashboardConversationsRouteWithChildren,
   DashboardEscalationsRoute: DashboardEscalationsRoute,
-  DashboardFaqRoute: DashboardFaqRoute,
+  DashboardFaqsRoute: DashboardFaqsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSetupRoute: DashboardSetupRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardConversationsIdRoute: DashboardConversationsIdRoute,
+  DashboardConversationsIndexRoute: DashboardConversationsIndexRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
