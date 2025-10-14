@@ -1,0 +1,56 @@
+{
+  "compilerOptions": {
+    // File Layout
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    // Environment Settings
+    // See also https://aka.ms/tsconfig/module
+    // "module": "esnext",            // ✅ keep as ESNext (for ESM)
+    "module": "ESNext",              // same as your line, case-normalized
+    "target": "ES2020",
+
+    // For nodejs:
+    "lib": ["esnext"],               // ✅ uncommented for Node ESM env
+    "types": ["node"],               // ✅ uncommented for Node ESM env
+    // and npm install -D @types/node
+
+    // Module Resolution (added for ESM imports)
+    "moduleResolution": "Bundler",   // ✅ helps resolve .ts/.js imports cleanly
+    "resolveJsonModule": true,       // ✅ allows importing JSON if needed
+    /*  enable direct .ts imports */
+    "allowImportingTsExtensions": true,
+    "noEmit": true,    
+
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // Stricter Typechecking Options
+    "esModuleInterop": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Style Options
+    // "noImplicitReturns": true,
+    // "noImplicitOverride": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noPropertyAccessFromIndexSignature": true,
+
+    // Recommended Options
+    "strict": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+  },
+  // ✅ Added: ensure ts-node runs ESM properly
+  "ts-node": {
+    "esm": true
+  }
+}
