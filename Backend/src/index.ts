@@ -1,4 +1,5 @@
-import { createServer } from "../src/server.ts";
+import 'dotenv/config';
+import { createServer } from "./server.ts";
 
 const port = process.env.PORT || 3000;
 const app = createServer();

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../../config/prisma.ts";
+import { generate } from "../../llm/adapter.ts";
 
 const router = Router({ mergeParams: true }); // mergeParams to access sessionId from parent route
 
@@ -101,8 +102,8 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
-    // Create the message
-    const message = await prisma.message.create({
+    // 1️⃣ Persist user message
+    const userMsg = await prisma.message.create({
       data: {
         sessionId,
         sender,
@@ -111,42 +112,109 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       },
     });
 
-    // Phase 2: Temporarily return a fixed bot message (mock) if sender is user
-    let botResponse = null;
+    // Phase 3: LLM Orchestration - Generate intelligent response if sender is user
+    let botMsg = null;
+    let shouldEscalate = false;
+
     if (sender === "user") {
-      // Generate mock bot response
-      const mockResponses = [
-        "Thank you for your message. I'm here to help you with your inquiry.",
-        "I understand your concern. Let me look into that for you.",
-        "I appreciate you reaching out. Could you provide more details?",
-        "Thanks for contacting support. I'll do my best to assist you.",
-        "I see what you're asking about. Let me help you with that.",
-      ];
-      
-      const randomResponse = mockResponses[Math.floor(Math.random() * mockResponses.length)];
-      
-      // Create bot response message
-      botResponse = await prisma.message.create({
+      // 2️⃣ Fetch context (recent messages, FAQs, summary)
+      const sessionWithContext = await prisma.session.findUnique({
+        where: { id: sessionId },
+        include: {
+          messages: {
+            orderBy: { createdAt: "asc" },
+            take: 10, // Last 10 messages for context
+          },
+          company: {
+            include: {
+              faqs: {
+                take: 5, // Top 5 FAQs for context
+              },
+            },
+          },
+        },
+      });
+
+      if (!sessionWithContext) {
+        return res.status(404).json({
+          success: false,
+          error: { message: "Session not found" },
+        });
+      }
+
+      // Prepare messages for LLM
+      const messages = sessionWithContext.messages
+        .slice(-6) // Use last 6 messages for context
+        .map((m) => ({
+          role: m.sender === "user" ? "user" : m.sender === "orion" ? "assistant" : "system",
+          text: m.text,
+        }));
+
+      // Prepare knowledge base from FAQs
+      const knowledge = sessionWithContext.company.faqs.map(faq => ({
+        question: faq.question,
+        answer: faq.answer,
+      }));
+
+      // 3️⃣ Generate response via LLM (Gemini or Mock)
+      const { text: reply, confidence: botConfidence } = await generate({
+        messages,
+        knowledge,
+      });
+
+      // 4️⃣ Persist bot message
+      botMsg = await prisma.message.create({
         data: {
           sessionId,
           sender: "orion",
-          text: randomResponse,
-          confidence: 0.95, // Mock confidence score
+          text: reply,
+          confidence: botConfidence,
         },
       });
+
+      // 5️⃣ Escalation logic
+      const threshold = parseFloat(process.env.CONF_THRESHOLD ?? "0.4");
+      shouldEscalate = botConfidence !== null && botConfidence < threshold;
+
+      if (shouldEscalate) {
+        await prisma.session.update({
+          where: { id: sessionId },
+          data: {
+            status: "escalated",
+            escalationReason: `Low confidence response (${botConfidence?.toFixed(2)}). Human assistance required.`,
+          },
+        });
+
+        // Add system message about escalation
+        await prisma.message.create({
+          data: {
+            sessionId,
+            sender: "system",
+            text: "This conversation has been escalated to a human agent due to complexity. An agent will assist you shortly.",
+          },
+        });
+      }
     }
 
     // Update session's updatedAt timestamp
     await prisma.session.update({
-      where: { id: sessionId } ,
+      where: { id: sessionId },
       data: { updatedAt: new Date() },
     });
 
+    // 6️⃣ Respond to client
     res.status(201).json({
       success: true,
       data: {
-        userMessage: message,
-        ...(botResponse && { botResponse }),
+        userMessageId: userMsg.id,
+        userMessage: userMsg,
+        ...(botMsg && {
+          botMessageId: botMsg.id,
+          botMessage: botMsg,
+          reply: botMsg.text,
+          confidence: botMsg.confidence,
+        }),
+        shouldEscalate,
       },
     });
   } catch (error) {

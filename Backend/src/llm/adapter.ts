@@ -1,9 +1,37 @@
-import { mockLLM } from "./providers/mock";
-// future: import { openaiLLM } from "./providers/openai"
+import { geminiLLM } from "./providers/gemini.ts";
+import { mockLLM } from "./providers/mock.ts";
 
-export async function generate({ system, messages, knowledge }) {
-  if (process.env.LLM_PROVIDER === "mock") {
-    return mockLLM({ messages, knowledge });
+export interface LLMMessage {
+  role: string;
+  text: string;
+}
+
+export interface LLMKnowledge {
+  question: string;
+  answer: string;
+}
+
+export interface LLMResponse {
+  text: string;
+  confidence: number;
+  usage?: {
+    total: number;
+  };
+}
+
+export async function generate({ 
+  messages, 
+  knowledge 
+}: {
+  messages: LLMMessage[];
+  knowledge: LLMKnowledge[];
+}): Promise<LLMResponse> {
+  const provider = process.env.LLM_PROVIDER ?? "mock";
+
+  if (provider === "gemini") {
+    return geminiLLM({ messages, knowledge });
   }
-  throw new Error("LLM provider not implemented");
+
+  // default mock for local testing
+  return mockLLM({ messages, knowledge });
 }
