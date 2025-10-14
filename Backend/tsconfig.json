@@ -52,5 +52,7 @@
   // ✅ Added: ensure ts-node runs ESM properly
   "ts-node": {
     "esm": true
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "prisma"]
 }
