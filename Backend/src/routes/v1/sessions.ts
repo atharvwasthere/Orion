@@ -124,7 +124,67 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-// PUT update session (status/escalation)
+// PATCH update session (status/escalation) - As per API contract Phase 2
+router.patch("/:sessionId", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { companyId, sessionId } = req.params as { companyId: string; sessionId: string };
+    const { status, escalationReason, summary } = req.body;
+
+    // Validate status if provided
+    if (status && !["active", "escalated", "closed"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: { message: "Invalid status. Must be 'active', 'escalated', or 'closed'" },
+      });
+    }
+
+    // Check if session exists and belongs to the company
+    const existingSession = await prisma.session.findFirst({
+      where: {
+        id: sessionId,
+        companyId,
+      },
+    });
+
+    if (!existingSession) {
+      return res.status(404).json({
+        success: false,
+        error: { message: "Session not found" },
+      });
+    }
+
+    // If escalating, require escalationReason
+    if (status === "escalated" && !escalationReason) {
+      return res.status(400).json({
+        success: false,
+        error: { message: "Escalation reason is required when escalating a session" },
+      });
+    }
+
+    const session = await prisma.session.update({
+      where: { id: sessionId },
+      data: {
+        ...(status && { status }),
+        ...(escalationReason && { escalationReason }),
+        ...(summary !== undefined && { summary }),
+      },
+      include: {
+        messages: {
+          orderBy: { createdAt: "asc" },
+        },
+      },
+    });
+
+    res.json({
+      success: true,
+      data: session,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PUT update session (full update for backward compatibility)
 router.put("/:sessionId", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { companyId, sessionId } = req.params as { companyId: string; sessionId: string };

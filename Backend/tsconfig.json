@@ -12,7 +12,7 @@
 
     // For nodejs:
     "lib": ["esnext"],               // ✅ uncommented for Node ESM env
-    "types": ["node"],               // ✅ uncommented for Node ESM env
+    "types": ["node" , "jest"],               // ✅ uncommented for Node ESM env
     // and npm install -D @types/node
 
     // Module Resolution (added for ESM imports)
@@ -53,6 +53,6 @@
   "ts-node": {
     "esm": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*","tests", "**/*.test.ts"],
   "exclude": ["node_modules", "dist", "prisma"]
 }

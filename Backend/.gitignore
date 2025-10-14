@@ -3,3 +3,5 @@ dist/
 .env
 prisma/migration_lock.toml
 prisma/migrations/
+context.md
+PRD.md

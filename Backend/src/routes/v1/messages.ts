@@ -111,15 +111,43 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       },
     });
 
+    // Phase 2: Temporarily return a fixed bot message (mock) if sender is user
+    let botResponse = null;
+    if (sender === "user") {
+      // Generate mock bot response
+      const mockResponses = [
+        "Thank you for your message. I'm here to help you with your inquiry.",
+        "I understand your concern. Let me look into that for you.",
+        "I appreciate you reaching out. Could you provide more details?",
+        "Thanks for contacting support. I'll do my best to assist you.",
+        "I see what you're asking about. Let me help you with that.",
+      ];
+      
+      const randomResponse = mockResponses[Math.floor(Math.random() * mockResponses.length)];
+      
+      // Create bot response message
+      botResponse = await prisma.message.create({
+        data: {
+          sessionId,
+          sender: "orion",
+          text: randomResponse,
+          confidence: 0.95, // Mock confidence score
+        },
+      });
+    }
+
     // Update session's updatedAt timestamp
     await prisma.session.update({
-      where: { id: sessionId },
+      where: { id: sessionId } ,
       data: { updatedAt: new Date() },
     });
 
     res.status(201).json({
       success: true,
-      data: message,
+      data: {
+        userMessage: message,
+        ...(botResponse && { botResponse }),
+      },
     });
   } catch (error) {
     next(error);
