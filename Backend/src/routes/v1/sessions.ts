@@ -1,6 +1,7 @@
 import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../../config/prisma.ts";
+import { updateSessionSummary } from "../../services/summary";
 
 const router = Router({ mergeParams: true }); // mergeParams to access companyId from parent route
 
@@ -238,6 +239,39 @@ router.put("/:sessionId", async (req: Request, res: Response, next: NextFunction
     res.json({
       success: true,
       data: session,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET session summary - Phase 4
+router.get("/:sessionId/summary", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { sessionId } = req.params as { sessionId: string };
+
+    // Check if session exists
+    const session = await prisma.session.findUnique({
+      where: { id: sessionId },
+    });
+
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        error: { message: "Session not found" },
+      });
+    }
+
+    // Generate and update summary
+    const summary = await updateSessionSummary(sessionId);
+
+    res.json({
+      success: true,
+      data: {
+        sessionId,
+        summary,
+        updatedAt: new Date(),
+      },
     });
   } catch (error) {
     next(error);

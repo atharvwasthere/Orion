@@ -30,7 +30,7 @@ export async function mockLLM({
   }
 
   // Check if any FAQ matches the user's question (simple keyword matching)
-  let selectedResponse = mockResponses[Math.floor(Math.random() * mockResponses.length)];
+  let selectedResponse: string = mockResponses[Math.floor(Math.random() * mockResponses.length)]!;
   let confidence = 0.6; // Default mock confidence
 
   if (knowledge.length > 0) {

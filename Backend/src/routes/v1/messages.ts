@@ -2,6 +2,15 @@ import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../../config/prisma.ts";
 import { generate } from "../../llm/adapter.ts";
+import {
+  updateSessionConfidence,
+  shouldEscalateLowConfidence,
+  updateOOSStreak,
+  isOOS,
+} from "../../services/confidence";
+import { deriveUserFeedback, detectRepeatQuestion } from "../../services/helpers";
+import { faqRetrievalScore, cheapOOSClassifier } from "../../services/retrieval";
+import { shouldGenerateSummary, updateSessionSummary } from "../../services/summary";
 
 const router = Router({ mergeParams: true }); // mergeParams to access sessionId from parent route
 
@@ -157,66 +166,166 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       }));
 
       // 3️⃣ Generate response via LLM (Gemini or Mock)
-      const { text: reply, confidence: botConfidence } = await generate({
+      const { text: reply, confidence: model_conf } = await generate({
         messages,
         knowledge,
       });
 
-      // 4️⃣ Persist bot message
+      // 🔍 Phase 3.5: Compute retrieval score
+      const retrieval_score = await faqRetrievalScore(
+        sessionWithContext.company.id,
+        text
+      );
+
+      // 🔍 Phase 3.5: Optional OOS classifier
+      const prob_oos = cheapOOSClassifier(text);
+
+      // 🔍 Phase 3.5: OOS handling (red wire - immediate escalation)
+      const newOOS = updateOOSStreak(
+        session.oosStreak ?? 0,
+        retrieval_score,
+        process.env
+      );
+      const oosTrip = isOOS(newOOS, process.env, prob_oos);
+
+      let escalationReason: 'low_confidence' | 'out_of_scope' | undefined;
+
+      if (oosTrip) {
+        shouldEscalate = true;
+        escalationReason = 'out_of_scope';
+      }
+
+      // 🔍 Phase 3.5: Low-confidence check (per-message)
+      if (!shouldEscalate && shouldEscalateLowConfidence(model_conf, process.env)) {
+        shouldEscalate = true;
+        escalationReason = 'low_confidence';
+      }
+
+      // 4️⃣ Persist bot message with confidence
       botMsg = await prisma.message.create({
         data: {
           sessionId,
           sender: "orion",
           text: reply,
-          confidence: botConfidence,
+          confidence: model_conf ?? undefined,
         },
       });
 
-      // 5️⃣ Escalation logic
-      const threshold = parseFloat(process.env.CONF_THRESHOLD ?? "0.4");
-      shouldEscalate = botConfidence !== null && botConfidence < threshold;
+      // 🔍 Phase 3.5: Session confidence meter update
+      const prevC = session.sessionConfidence ?? 1.0;
+      const user_feedback = deriveUserFeedback(text);
+      const messageHistory = messages.map(m => ({ sender: m.role === 'user' ? 'user' : 'orion', text: m.text }));
+      const repeat_question = detectRepeatQuestion(text, messageHistory);
 
+      const { next: sessionConfidence, penalty, boost } = updateSessionConfidence(
+        prevC,
+        {
+          model_conf: model_conf ?? null,
+          retrieval_score,
+          user_feedback,
+          repeat_question,
+        },
+        process.env
+      );
+
+      // 📊 Logging for observability
+      console.log({
+        route: 'POST /messages',
+        sessionId,
+        model_conf,
+        sessionConfidence,
+        retrieval_score,
+        shouldEscalate,
+        escalationReason,
+        penalty,
+        boost,
+        user_feedback,
+        repeat_question,
+      });
+
+      // 5️⃣ Update session with confidence tracking and escalation
+      const updateData: any = {
+        sessionConfidence,
+        status: shouldEscalate ? 'escalated' : 'active',
+        escalationReason: shouldEscalate ? escalationReason : null,
+        oosStreak: oosTrip ? 0 : newOOS,
+        updatedAt: new Date(),
+      };
+      
+      if (penalty >= 0.25) {
+        updateData.badTurns = { increment: 1 };
+      }
+      if (boost >= 0.05) {
+        updateData.goodTurns = { increment: 1 };
+      }
+
+      await prisma.session.update({
+        where: { id: sessionId },
+        data: updateData,
+      });
+
+      // Add system message if escalated
       if (shouldEscalate) {
-        await prisma.session.update({
-          where: { id: sessionId },
-          data: {
-            status: "escalated",
-            escalationReason: `Low confidence response (${botConfidence?.toFixed(2)}). Human assistance required.`,
-          },
-        });
-
-        // Add system message about escalation
         await prisma.message.create({
           data: {
             sessionId,
             sender: "system",
-            text: "This conversation has been escalated to a human agent due to complexity. An agent will assist you shortly.",
+            text:
+              escalationReason === 'out_of_scope'
+                ? "This conversation has been escalated to human support as your query appears to be outside our knowledge base."
+                : "This conversation has been escalated to human support due to low confidence responses. An agent will assist you shortly.",
           },
         });
       }
+
+      // 🔄 Phase 4: Auto-generate summary if threshold reached
+      if (await shouldGenerateSummary(sessionId)) {
+        // Generate summary asynchronously (don't block response)
+        updateSessionSummary(sessionId)
+          .then(summary => {
+            console.log({
+              event: 'auto_summary_generated',
+              sessionId,
+              summaryLength: summary.length,
+            });
+          })
+          .catch(err => {
+            console.error('Auto-summary error:', err);
+          });
+      }
     }
 
-    // Update session's updatedAt timestamp
-    await prisma.session.update({
-      where: { id: sessionId },
-      data: { updatedAt: new Date() },
-    });
-
-    // 6️⃣ Respond to client
-    res.status(201).json({
+    // 6️⃣ Respond to client with Phase 3.5 confidence metrics
+    const responseData: any = {
       success: true,
       data: {
         userMessageId: userMsg.id,
         userMessage: userMsg,
-        ...(botMsg && {
-          botMessageId: botMsg.id,
-          botMessage: botMsg,
-          reply: botMsg.text,
-          confidence: botMsg.confidence,
-        }),
         shouldEscalate,
       },
-    });
+    };
+
+    // Add bot response and confidence metrics if bot replied
+    if (botMsg) {
+      // Fetch updated session to get latest confidence values
+      const updatedSession = await prisma.session.findUnique({
+        where: { id: sessionId },
+        select: { sessionConfidence: true, escalationReason: true },
+      });
+
+      responseData.data = {
+        ...responseData.data,
+        botMessageId: botMsg.id,
+        botMessage: botMsg,
+        reply: botMsg.text,
+        confidence: botMsg.confidence,
+        sessionConfidence: updatedSession?.sessionConfidence,
+        retrievalScore: await faqRetrievalScore(session.companyId, text),
+        escalationReason: updatedSession?.escalationReason,
+      };
+    }
+
+    res.status(201).json(responseData);
   } catch (error) {
     next(error);
   }
