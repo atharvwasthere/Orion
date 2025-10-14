@@ -233,7 +233,7 @@ describe('Phase 3 - LLM Orchestration & Escalation', () => {
           }
         });
         expect(messages.length).toBeGreaterThan(0);
-        expect(messages[0].text).toContain('escalated');
+        expect(messages[0]?.text).toContain('escalated');
       } else {
         expect(response.body.data.shouldEscalate).toBe(false);
       }

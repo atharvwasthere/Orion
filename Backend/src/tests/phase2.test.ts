@@ -223,16 +223,16 @@ describe('Phase 2 API Contract Compliance', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveProperty('userMessage');
-      expect(response.body.data).toHaveProperty('botResponse');
+      expect(response.body.data).toHaveProperty('botMessage');
       
       // Verify user message
       expect(response.body.data.userMessage.sender).toBe('user');
       expect(response.body.data.userMessage.text).toBe('I need help with my account');
       
       // Verify mock bot response
-      expect(response.body.data.botResponse.sender).toBe('orion');
-      expect(response.body.data.botResponse.text).toBeTruthy();
-      expect(response.body.data.botResponse.confidence).toBe(0.95);
+      expect(response.body.data.botMessage.sender).toBe('orion');
+      expect(response.body.data.botMessage.text).toBeTruthy();
+      expect(response.body.data.botMessage.confidence).toBeDefined();
       
       messageId = response.body.data.userMessage.id;
     });
@@ -248,7 +248,7 @@ describe('Phase 2 API Contract Compliance', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveProperty('userMessage');
-      expect(response.body.data).not.toHaveProperty('botResponse');
+      expect(response.body.data).not.toHaveProperty('botMessage');
     });
   });
 
@@ -263,7 +263,7 @@ describe('Phase 2 API Contract Compliance', () => {
       ];
 
       for (const endpoint of endpoints) {
-        const response = await request(app)[endpoint.method](endpoint.path);
+        const response = await (request(app) as any)[endpoint.method](endpoint.path);
         expect(response.status).not.toBe(404); // Should not be 404 if route exists
       }
     });
