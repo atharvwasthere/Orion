@@ -27,7 +27,7 @@
   --accent-foreground: #1b1305; /* Dark Brown */
   --destructive: oklch(0.577 0.245 27.325); /* Warm Red-Orange (OKLCH) */
   --destructive-foreground: oklch(0.577 0.245 27.325); /* Same Warm Red-Orange */
-  /* --border: #ffe5cc; Pale Peach Border */
+  --border: #ffe5cc; /*Pale Peach Border*/
   --input: #ffe5cc; /* Pale Peach Input */
   --ring: #ff9f1c; /* Warm Amber Highlight */
   --chart-1: #ff7b00; /* Vivid Orange */

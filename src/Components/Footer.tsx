@@ -2,7 +2,7 @@ import { OrionLogo } from "@/Components/logo/orion-logo";
 
 function Footer() {
   return (
-    <footer className="w-screen bg-foreground text-background py-16 border-2 border-green-500">
+    <footer className="w-screen bg-foreground text-background py-16 ">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">

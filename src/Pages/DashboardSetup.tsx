@@ -1,7 +1,34 @@
-import { useState } from "react"
+import { useState, useEffect } from "react";
 import { Button } from "@/Components/ui/button"
 import { Card, CardContent } from "@/Components/ui/card"
 import { useNavigate } from "@tanstack/react-router";
+
+
+function ElapsedTime() {
+  const startTime = useState(Date.now())[0]; // store when component loaded
+  const [elapsed, setElapsed] = useState("0 sec");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const diff = Date.now() - startTime;
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+
+      let display;
+      if (hours > 0) display = `${hours} hour${hours > 1 ? "s" : ""} ago`;
+      else if (minutes > 0) display = `${minutes} min${minutes > 1 ? "s" : ""} ago`;
+      else display = `${seconds} sec${seconds > 1 ? "s" : ""} ago`;
+
+      setElapsed(display);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  return <p className="text-muted-foreground mb-6">Last trained: {elapsed}</p>;
+}
+
 
 export default function SetupPage() {
   const navigate = useNavigate()
@@ -73,7 +100,7 @@ export default function SetupPage() {
               </svg>
             </div>
             <h2 className="font-display text-2xl font-bold mb-2">Orion is active.</h2>
-            <p className="text-muted-foreground mb-6">Last trained: 2 hours ago</p>
+            <ElapsedTime />            
             <Button 
               size="lg"
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
