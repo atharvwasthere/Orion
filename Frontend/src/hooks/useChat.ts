@@ -2,6 +2,16 @@ import { useState, useEffect, useRef } from 'react';
 import { apiFetch } from '@/lib/api';
 import { ensureCompanyId, createSession } from '@/lib/ensureCompanyId';
 
+/**
+ * useChat hook for the preview chat (/chat route)
+ * 
+ * IMPORTANT: This hook automatically creates a session if none exists in localStorage.
+ * Only use this for the interactive preview chat page.
+ * 
+ * For read-only views (e.g., /dashboard/conversations/:id), fetch session data
+ * directly with apiFetch() instead of using this hook.
+ */
+
 export type Message = {
   id: string;
   sender: 'user' | 'bot';
