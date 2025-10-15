@@ -111,7 +111,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
-    // 1️⃣ Persist user message
+    // 1️ Persist user message
     const userMsg = await prisma.message.create({
       data: {
         sessionId,
@@ -126,18 +126,18 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     let shouldEscalate = false;
 
     if (sender === "user") {
-      // 2️⃣ Fetch context (recent messages, FAQs, summary)
+      // 2️ Fetch context (recent messages, FAQs, summary)
       const sessionWithContext = await prisma.session.findUnique({
         where: { id: sessionId },
         include: {
           messages: {
             orderBy: { createdAt: "asc" },
-            take: 10, // Last 10 messages for context
+            take: 80, // Last 80 messages for context
           },
           company: {
             include: {
               faqs: {
-                take: 5, // Top 5 FAQs for context
+                take: 80, // Top 80 FAQs for context
               },
             },
           },
@@ -165,22 +165,22 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         answer: faq.answer,
       }));
 
-      // 3️⃣ Generate response via LLM (Gemini or Mock)
+      // 3️ Generate response via LLM (Gemini or Mock)
       const { text: reply, confidence: model_conf } = await generate({
         messages,
         knowledge,
       });
 
-      // 🔍 Phase 3.5: Compute retrieval score
+      //  Phase 3.5: Compute retrieval score
       const retrieval_score = await faqRetrievalScore(
         sessionWithContext.company.id,
         text
       );
 
-      // 🔍 Phase 3.5: Optional OOS classifier
+      //  Phase 3.5: Optional OOS classifier
       const prob_oos = cheapOOSClassifier(text);
 
-      // 🔍 Phase 3.5: OOS handling (red wire - immediate escalation)
+      //  Phase 3.5: OOS handling (red wire - immediate escalation)
       const newOOS = updateOOSStreak(
         session.oosStreak ?? 0,
         retrieval_score,
@@ -195,13 +195,13 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         escalationReason = 'out_of_scope';
       }
 
-      // 🔍 Phase 3.5: Low-confidence check (per-message)
+      //  Phase 3.5: Low-confidence check (per-message)
       if (!shouldEscalate && shouldEscalateLowConfidence(model_conf, process.env)) {
         shouldEscalate = true;
         escalationReason = 'low_confidence';
       }
 
-      // 4️⃣ Persist bot message with confidence
+      // 4️ Persist bot message with confidence
       botMsg = await prisma.message.create({
         data: {
           sessionId,
@@ -211,7 +211,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         },
       });
 
-      // 🔍 Phase 3.5: Session confidence meter update
+      //  Phase 3.5: Session confidence meter update
       const prevC = session.sessionConfidence ?? 1.0;
       const user_feedback = deriveUserFeedback(text);
       const messageHistory = messages.map(m => ({ sender: m.role === 'user' ? 'user' : 'orion', text: m.text }));
@@ -228,7 +228,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         process.env
       );
 
-      // 📊 Logging for observability
+      //  Logging for observability
       console.log({
         route: 'POST /messages',
         sessionId,
@@ -243,7 +243,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         repeat_question,
       });
 
-      // 5️⃣ Update session with confidence tracking and escalation
+      // 5️ Update session with confidence tracking and escalation
       const updateData: any = {
         sessionConfidence,
         status: shouldEscalate ? 'escalated' : 'active',
@@ -278,7 +278,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         });
       }
 
-      // 🔄 Phase 4: Auto-generate summary if threshold reached
+      //  Phase 4: Auto-generate summary if threshold reached
       if (await shouldGenerateSummary(sessionId)) {
         // Generate summary asynchronously (don't block response)
         updateSessionSummary(sessionId)
@@ -295,7 +295,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       }
     }
 
-    // 6️⃣ Respond to client with Phase 3.5 confidence metrics
+    // 6️ Respond to client with Phase 3.5 confidence metrics
     const responseData: any = {
       success: true,
       data: {

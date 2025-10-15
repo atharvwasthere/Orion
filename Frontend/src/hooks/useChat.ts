@@ -71,11 +71,16 @@ export function useChat() {
         const cId = await ensureCompanyId();
         setCompanyId(cId);
 
-        // Get or create session
+        // Get or create session, ensuring it belongs to current company
         let sId = localStorage.getItem('sessionId');
-        if (!sId) {
-          // Create default session if none exists
+        const sessionCompanyId = localStorage.getItem('sessionCompanyId');
+
+        // If no session OR session belongs to different company, create new one
+        if (!sId || sessionCompanyId !== cId) {
+          console.log('[useChat] Creating new session for company:', cId);
           sId = await createSession('guest@example.com');
+          // Store the company this session belongs to
+          localStorage.setItem('sessionCompanyId', cId);
         }
         setSessionId(sId);
 

@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback } from "@/Components/ui/avatar"
 import { OrionLogo } from "@/Components/logo/orion-logo"
 import { useChat } from "@/hooks/useChat"
 import { apiFetch } from "@/lib/api"
+import { getActiveCompanyName } from "@/lib/companyContext"
 
 type Faq = {
   id: string;
@@ -19,14 +20,13 @@ type Faq = {
   tags?: string[];
   createdAt: string;
 };
-
-const company = { name: "Acme Inc." };
 const quickChips = ["Check order status", "Request refund", "Speak to human"];
 
 export default function ChatPage() {
   const [message, setMessage] = useState("")
   const [isInsightsOpen, setIsInsightsOpen] = useState(false)
   const [faqs, setFaqs] = useState<Faq[]>([])
+  const [companyName, setCompanyName] = useState<string | null>(null)
   
   const {
     sessionId,
@@ -42,6 +42,12 @@ export default function ChatPage() {
     sendMessage,
     scrollRef,
   } = useChat()
+
+  // Get company name from context
+  useEffect(() => {
+    const name = getActiveCompanyName();
+    setCompanyName(name || 'Your Company');
+  }, []);
 
   // Load FAQs for knowledge panel
   useEffect(() => {
@@ -221,7 +227,7 @@ export default function ChatPage() {
             {/* Session Strip */}
             <div className="border-b border-[#F3E3D7] px-6 py-3">
               <p className="text-sm text-[#6B6B6B]">
-                {company.name} • {sessionId || 'Loading...'} • {localStorage.getItem('sessionId') ? 'User Session' : 'Guest'}
+                {companyName || 'Loading...'} • {sessionId || 'Loading...'} • {localStorage.getItem('sessionId') ? 'User Session' : 'Guest'}
               </p>
             </div>
 

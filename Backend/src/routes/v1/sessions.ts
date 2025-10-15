@@ -125,7 +125,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-// PATCH update session (status/escalation) - As per API contract Phase 2
+// PATCH update session (status/escalation) 
 router.patch("/:sessionId", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { companyId, sessionId } = req.params as { companyId: string; sessionId: string };

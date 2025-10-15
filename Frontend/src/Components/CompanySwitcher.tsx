@@ -42,6 +42,9 @@ export function CompanySwitcher() {
   const handleSwitch = (companyId: string) => {
     const company = companies.find(c => c.id === companyId);
     if (company) {
+      // Clear session data before switching to ensure fresh session for new company
+      localStorage.removeItem('sessionId');
+      localStorage.removeItem('sessionCompanyId');
       switchCompany(company);
     }
   };
