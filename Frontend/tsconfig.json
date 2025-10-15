@@ -9,6 +9,8 @@
     }
   ],
   "compilerOptions": {
+    "types": ["node"],
+    "jsx": "react-jsx",
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"]

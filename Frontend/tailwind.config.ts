@@ -9,9 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "sans-serif"],
+        sans: ['Satoshi', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['CabinetGrotesk', 'sans-serif'],
         mono: ["var(--font-geist-mono)", "monospace"],
-        display: ["var(--font-)","var(--font-space-grotesk)", "sans-serif"],
       },
       colors: {
         background: "var(--background)",

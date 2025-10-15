@@ -40,7 +40,7 @@
     "@tanstack/router-plugin": "^1.132.51",
     "@types/node": "^24.7.2",
     "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.1",
+    "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.0.4",
     "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "eslint": "^9.36.0",
