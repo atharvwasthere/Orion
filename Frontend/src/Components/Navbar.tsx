@@ -11,10 +11,10 @@ export default function Navbar() {
           <OrionLogo className="-mt-2" />
           <div className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
             <a
-              href="#platform"
+              href="/demo"
               className="hover:text-primary transition-colors"
             >
-              Platform
+              Demo
             </a>
             <a href="#about" className="hover:text-primary transition-colors">
               About

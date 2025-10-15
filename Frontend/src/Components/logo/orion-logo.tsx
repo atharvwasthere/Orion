@@ -9,7 +9,7 @@ export function OrionLogo({ className = "" }: { className?: string }) {
           <circle cx="16" cy="16" r="3" fill="#FFF3E4" />
         </svg>
       </div>
-      <span className="font-display text-2xl font-bold tracking-tight">orion</span>
+      <span className="font-display text-2xl font-bold tracking-tight">Orion</span>
     </div>
   )
 }

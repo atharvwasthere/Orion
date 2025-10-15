@@ -6,6 +6,7 @@ import Features from "@/Components/Features";
 import DashboardPreview from "@/Components/DashboardPreview";
 import { TrustedBy } from "@/Components/TrustedBy";
 import MeetOrion from "@/Components/MeetOrion";
+import MarketingFeatureBands from "@/Components/MarketingFeatureBands";
 
 export default function Landing() {
   return (
@@ -15,6 +16,7 @@ export default function Landing() {
         <Hero />
         <TrustedBy />
         <MeetOrion />
+        <MarketingFeatureBands />
         <Features />
         <DashboardPreview />
 
