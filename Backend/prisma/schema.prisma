@@ -53,6 +53,7 @@ model Message {
   text       String
   confidence Float?     // Turn confidence score
   mode       String?    // "confident" | "cautious" | "unsure" | "escalate"
+  meta       Json?      // Structured response data (type, title, sections, contextUsed, tone, shouldEscalate)
   createdAt  DateTime   @default(now())
   session    Session    @relation(fields: [sessionId], references: [id])
   @@index([sessionId, createdAt])

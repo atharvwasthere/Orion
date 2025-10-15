@@ -12,6 +12,7 @@ import { deriveUserFeedback, detectRepeatQuestion } from "../../services/helpers
 import { faqRetrievalScore, cheapOOSClassifier } from "../../services/retrieval.ts";
 import { shouldGenerateSummary, updateSessionSummary } from "../../services/summary.ts";
 import { getHybridContext, formatHybridContext } from "../../services/hybridContext.ts";
+import { generateStructured } from "../../llm/structuredGenerate.ts";
 
 const router = Router({ mergeParams: true }); // mergeParams to access sessionId from parent route
 
@@ -180,11 +181,40 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         });
       }
 
-      // 3️ Generate response via LLM (Gemini or Mock)
-      const { text: reply, confidence: model_conf } = await generate({
-        messages,
-        knowledge,
-      });
+      // 3️ Phase 9: Generate structured response via Gemini
+      const USE_STRUCTURED = process.env.USE_STRUCTURED_OUTPUT === "true";
+      
+      let reply: string;
+      let model_conf: number;
+      let structuredMeta: any = null;
+
+      if (USE_STRUCTURED) {
+        const structuredResponse = await generateStructured({
+          system: "You are Orion, a helpful customer support assistant. Use the provided context to answer questions accurately and professionally.",
+          messages,
+          knowledge,
+          companyProfile: hybridContext.companyProfile,
+        });
+
+        reply = structuredResponse.summary;
+        model_conf = structuredResponse.confidence;
+        structuredMeta = {
+          type: structuredResponse.type,
+          title: structuredResponse.title,
+          sections: structuredResponse.sections,
+          contextUsed: structuredResponse.contextUsed,
+          tone: structuredResponse.tone,
+          shouldEscalate: structuredResponse.shouldEscalate,
+        };
+      } else {
+        // Fallback to original generate function
+        const response = await generate({
+          messages,
+          knowledge,
+        });
+        reply = response.text;
+        model_conf = response.confidence;
+      }
 
       //  Phase 3.5: Compute retrieval score
       const retrieval_score = await faqRetrievalScore(
@@ -216,13 +246,14 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         escalationReason = 'low_confidence';
       }
 
-      // 4️ Persist bot message with confidence
+      // 4️ Persist bot message with confidence and structured meta
       botMsg = await prisma.message.create({
         data: {
           sessionId,
           sender: "orion",
           text: reply,
           confidence: model_conf ?? undefined,
+          ...(structuredMeta && { meta: structuredMeta }),
         },
       });
 
