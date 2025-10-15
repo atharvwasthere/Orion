@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import ConversationDetailPage from '@/Pages/DashboardConversations'
+import ConversationsListPage from '@/Pages/ConversationsPage'
 
 export const Route = createFileRoute('/dashboard/conversations/')({
-  component: ConversationDetailPage,
+  component: ConversationsListPage,
 })

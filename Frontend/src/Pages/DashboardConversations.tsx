@@ -1,6 +1,9 @@
 import { Card, CardContent } from "@/Components/ui/card"
 import { Button } from "@/Components/ui/button"
 import { Route } from "@/routes/dashboard/conversations/$id"
+import { useRouter } from "@tanstack/react-router"
+import { routeTree } from "@/routeTree.gen";
+import { router } from "@/router";
 
 export default function ConversationDetailPage() {
 const {id} = Route.useParams();
@@ -30,7 +33,7 @@ const {id} = Route.useParams();
           <h1 className="font-display text-3xl font-bold mb-1">Conversation: {id} </h1>
           <p className="text-muted-foreground">Refund issue · Resolved</p>
         </div>
-        <Button variant="outline">Close</Button>
+        <Button variant="outline" onClick={()=>{router.navigate({ to: "/dashboard/conversations" })}}>Close</Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -71,7 +74,7 @@ const {id} = Route.useParams();
                   <div key={i} className="flex items-center gap-3">
                     <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-primary to-accent rounded-full"
+                        className="h-full bg-green-500 rounded-full"
                         style={{ width: `${conf * 100}%` }}
                       />
                     </div>
