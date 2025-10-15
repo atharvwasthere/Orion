@@ -11,6 +11,7 @@ import {
 import { deriveUserFeedback, detectRepeatQuestion } from "../../services/helpers.ts";
 import { faqRetrievalScore, cheapOOSClassifier } from "../../services/retrieval.ts";
 import { shouldGenerateSummary, updateSessionSummary } from "../../services/summary.ts";
+import { getHybridContext, formatHybridContext } from "../../services/hybridContext.ts";
 
 const router = Router({ mergeParams: true }); // mergeParams to access sessionId from parent route
 
@@ -126,7 +127,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     let shouldEscalate = false;
 
     if (sender === "user") {
-      // 2️ Fetch context (recent messages, FAQs, summary)
+      // 2️ Fetch context (recent messages + hybrid context)
       const sessionWithContext = await prisma.session.findUnique({
         where: { id: sessionId },
         include: {
@@ -135,11 +136,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
             take: 80, // Last 80 messages for context
           },
           company: {
-            include: {
-              faqs: {
-                take: 80, // Top 80 FAQs for context
-              },
-            },
+            select: { id: true, name: true },
           },
         },
       });
@@ -159,11 +156,29 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
           text: m.text,
         }));
 
-      // Prepare knowledge base from FAQs
-      const knowledge = sessionWithContext.company.faqs.map(faq => ({
+      // Phase 5: Get hybrid context (company profile + top-k FAQs via embeddings)
+      const hybridContext = await getHybridContext(
+        sessionWithContext.company.id,
+        text,
+        20 // Top 20 FAQs
+      );
+
+      // Format hybrid context for LLM prompt
+      const contextString = formatHybridContext(hybridContext);
+
+      // Prepare knowledge base from hybrid context top FAQs
+      const knowledge = hybridContext.topFAQs.map(faq => ({
         question: faq.question,
         answer: faq.answer,
       }));
+
+      // Add company profile as system message if available
+      if (hybridContext.companyProfile) {
+        messages.unshift({
+          role: 'system',
+          text: `Company Context: ${hybridContext.companyProfile}`,
+        });
+      }
 
       // 3️ Generate response via LLM (Gemini or Mock)
       const { text: reply, confidence: model_conf } = await generate({

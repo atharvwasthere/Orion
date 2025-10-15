@@ -1,6 +1,8 @@
 import { Router} from "express";
 import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../../config/prisma.ts";
+import { embedFAQText } from "../../lib/embeddings.ts";
+import { generateCompanyProfile } from "../../lib/companyProfile.ts";
 
 const router = Router({ mergeParams: true }); // mergeParams to access companyId from parent route
 
@@ -67,7 +69,7 @@ router.get("/:faqId", async (req: Request, res: Response, next: NextFunction) =>
 router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { companyId } = req.params as { companyId: string };
-    const { question, answer, tags = [], embedding } = req.body ;
+    const { question, answer, tags = [] } = req.body ;
 
     // Validate required fields
     if (!question || !answer) {
@@ -89,15 +91,28 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
+    // Phase 2: Auto-generate embedding for FAQ
+    const faqText = `${question} ${answer}`;
+    const embedding = await embedFAQText(faqText);
+
     const faq = await prisma.fAQ.create({
       data: {
         companyId,
         question,
         answer,
         tags,
-        ...(embedding && { embedding }),
+        embedding,
       },
     });
+
+    // Phase 3: Regenerate company profile asynchronously
+    generateCompanyProfile(companyId)
+      .then(() => {
+        console.log(`Company profile regenerated for company ${companyId}`);
+      })
+      .catch((err) => {
+        console.error(`Failed to regenerate company profile: ${err.message}`);
+      });
 
     res.status(201).json({
       success: true,
@@ -112,7 +127,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 router.put("/:faqId", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { companyId, faqId } = req.params as { companyId: string; faqId: string };
-    const { question, answer, tags, embedding } = req.body;
+    const { question, answer, tags } = req.body;
 
     // Check if FAQ exists and belongs to the company
     const existingFaq = await prisma.fAQ.findFirst({
@@ -129,15 +144,33 @@ router.put("/:faqId", async (req: Request, res: Response, next: NextFunction) =>
       });
     }
 
+    // Phase 2: Regenerate embedding if question or answer changed
+    let embedding: number[] | undefined;
+    if (question || answer) {
+      const faqText = `${question || existingFaq.question} ${answer || existingFaq.answer}`;
+      embedding = await embedFAQText(faqText);
+    }
+
     const faq = await prisma.fAQ.update({
       where: { id: faqId },
       data: {
         ...(question && { question }),
         ...(answer && { answer }),
         ...(tags !== undefined && { tags }),
-        ...(embedding !== undefined && { embedding }),
+        ...(embedding && { embedding }),
       },
     });
+
+    // Phase 3: Regenerate company profile asynchronously if content changed
+    if (question || answer) {
+      generateCompanyProfile(companyId)
+        .then(() => {
+          console.log(`Company profile regenerated for company ${companyId}`);
+        })
+        .catch((err) => {
+          console.error(`Failed to regenerate company profile: ${err.message}`);
+        });
+    }
 
     res.json({
       success: true,
@@ -171,6 +204,15 @@ router.delete("/:faqId", async (req: Request, res: Response, next: NextFunction)
     await prisma.fAQ.delete({
       where: { id: faqId },
     });
+
+    // Phase 3: Regenerate company profile asynchronously
+    generateCompanyProfile(companyId)
+      .then(() => {
+        console.log(`Company profile regenerated for company ${companyId}`);
+      })
+      .catch((err) => {
+        console.error(`Failed to regenerate company profile: ${err.message}`);
+      });
 
     res.json({
       success: true,

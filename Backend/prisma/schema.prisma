@@ -21,6 +21,7 @@ model Company {
   updatedAt DateTime    @updatedAt
   faqs      FAQ[]
   sessions  Session[]
+  companyProfile String?  // auto-generated condensed FAQ context
 }
 
 // Each support session belongs to a company
@@ -65,7 +66,7 @@ model FAQ {
   question    String
   answer      String
   tags        String[]
+  embedding   Float[]  // Gemini vector (768 dims) for vector search
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  embedding   Float[]  // optional for vector search or RAG
 }
