@@ -107,8 +107,8 @@ Open the chat at: http://localhost:5173/chat
 flowchart LR
     A[User Message] --> B[Hybrid Context Retrieval]
     B -->|Embeddings + Company Profile + FAQs| C[Structured LLM Generation]
-    C -->|JSON {title, summary, sections[], confidence}| D[Confidence Engine]
-    D -->|EMA Smoothing + Escalation Logic| E[Session Store (Postgres)]
+    C -->|JSON  title, summary, sections , confidence| D[Confidence Engine]
+    D -->|EMA Smoothing + Escalation Logic| E[Session Store Postgres]
     E -->|Persist messages + summaries| F[Frontend Renderer]
     F -->|Structured UI| A
 ```
