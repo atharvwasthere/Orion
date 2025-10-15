@@ -94,9 +94,9 @@ export default function Features() {
 </Card>
 
           {/* E — 1/3 */}
-<Card className="lg:col-span-4 rounded-2xl border-2 hover:border-primary/50 transition bg-gradient-to-br from-primary/5 to-accent/5">
+<Card className="lg:col-span-4 mt-12 rounded-2xl border-2 hover:border-primary/50 transition bg-gradient-to-br from-primary/5 to-accent/5">
   <CardContent className="p-6 h-full flex flex-col items-center justify-center text-center">
-    <FeatureIcon type="lightning" className="w-10 h-10 mb-2" />
+    <FeatureIcon type="lightning" className="w-10 h-60 mb-2" />
     <h3 className="font-display text-2xl font-bold mb-1">One Platform</h3>
     <p className="text-sm text-muted-foreground max-w-sm">
       All your apps and data live together. No more juggling emails and spreadsheets.
