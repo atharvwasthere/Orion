@@ -1,7 +1,7 @@
 import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../../config/prisma.ts";
-import { updateSessionSummary } from "../../services/summary";
+import { updateSessionSummary } from "../../services/summary.ts";
 
 const router = Router({ mergeParams: true }); // mergeParams to access companyId from parent route
 

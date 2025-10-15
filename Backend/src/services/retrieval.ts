@@ -1,5 +1,5 @@
-import { prisma as db } from '../config/prisma';
-import { jaccard } from './helpers';
+import { prisma as db } from '../config/prisma.ts';
+import { jaccard } from './helpers.ts';
 
 /**
  * Calculate retrieval score for a user query against company FAQs

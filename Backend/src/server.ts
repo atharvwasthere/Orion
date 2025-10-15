@@ -3,7 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import { router as apiRouter } from "./routes/index.ts";
 import { errorHandler } from "./middleware/errorHandler.ts";
-import { requestLogger, errorLogger } from "./middleware/logger";
+import { requestLogger, errorLogger } from "./middleware/logger.ts";
 
 export function createServer() {
   const app = express();

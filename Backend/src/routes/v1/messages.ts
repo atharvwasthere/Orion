@@ -7,10 +7,10 @@ import {
   shouldEscalateLowConfidence,
   updateOOSStreak,
   isOOS,
-} from "../../services/confidence";
-import { deriveUserFeedback, detectRepeatQuestion } from "../../services/helpers";
-import { faqRetrievalScore, cheapOOSClassifier } from "../../services/retrieval";
-import { shouldGenerateSummary, updateSessionSummary } from "../../services/summary";
+} from "../../services/confidence.ts";
+import { deriveUserFeedback, detectRepeatQuestion } from "../../services/helpers.ts";
+import { faqRetrievalScore, cheapOOSClassifier } from "../../services/retrieval.ts";
+import { shouldGenerateSummary, updateSessionSummary } from "../../services/summary.ts";
 
 const router = Router({ mergeParams: true }); // mergeParams to access sessionId from parent route
 

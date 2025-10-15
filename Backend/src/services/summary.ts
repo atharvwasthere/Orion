@@ -1,5 +1,5 @@
-import { prisma } from '../config/prisma';
-import { generate } from '../llm/adapter';
+import { prisma } from '../config/prisma.ts';
+import { generate } from '../llm/adapter.ts';
 
 /**
  * Generate a concise summary of a support session
