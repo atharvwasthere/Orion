@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X } from "lucide-react"
+import { X, MessageCircle } from "lucide-react"   // 👈 added Lucide icon
 import { Button } from "@/Components/ui/button"
 
 const sampleMessages = [
@@ -49,9 +49,9 @@ export function ExpandableChat() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsExpanded(true)}
-              className="ml-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-2xl shadow-lg shadow-primary/30 transition-shadow hover:shadow-xl hover:shadow-primary/40"
+              className="ml-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-white shadow-lg shadow-primary/30 transition-shadow hover:shadow-xl hover:shadow-primary/40"
             >
-              💬
+              <MessageCircle className="h-7 w-7" />   {/* 👈 replaced emoji with icon */}
             </motion.button>
           </motion.div>
         ) : (

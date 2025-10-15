@@ -1,17 +1,24 @@
-import { useState, useEffect } from "react"
-import { Send, Signal, BookOpen, AlertTriangle, PieChart, Loader2 } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card"
-import { Badge } from "@/Components/ui/badge"
-import { Button } from "@/Components/ui/button"
-import { Textarea } from "@/Components/ui/textarea"
-import { ScrollArea } from "@/Components/ui/scroll-area"
-import { Progress } from "@/Components/ui/progress"
-import { Sheet, SheetContent, SheetTrigger } from "@/Components/ui/sheet"
-import { Avatar, AvatarFallback } from "@/Components/ui/avatar"
-import { OrionLogo } from "@/Components/logo/orion-logo"
-import { useChat } from "@/hooks/useChat"
-import { apiFetch } from "@/lib/api"
-import { getActiveCompanyName } from "@/lib/companyContext"
+import { useState, useEffect } from "react";
+import {
+  Send,
+  Signal,
+  BookOpen,
+  AlertTriangle,
+  PieChart,
+  Loader2,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Badge } from "@/Components/ui/badge";
+import { Button } from "@/Components/ui/button";
+import { Textarea } from "@/Components/ui/textarea";
+import { ScrollArea } from "@/Components/ui/scroll-area";
+import { Progress } from "@/Components/ui/progress";
+import { Sheet, SheetContent, SheetTrigger } from "@/Components/ui/sheet";
+import { OrionLogo } from "@/Components/logo/orion-logo";
+import { useChat } from "@/hooks/useChat";
+import { apiFetch } from "@/lib/api";
+import { getActiveCompanyName } from "@/lib/companyContext";
+import { ChatMessage } from "@/Components/Frontend_ChatMessage_Component";
 
 type Faq = {
   id: string;
@@ -23,11 +30,11 @@ type Faq = {
 const quickChips = ["Check order status", "Request refund", "Speak to human"];
 
 export default function ChatPage() {
-  const [message, setMessage] = useState("")
-  const [isInsightsOpen, setIsInsightsOpen] = useState(false)
-  const [faqs, setFaqs] = useState<Faq[]>([])
-  const [companyName, setCompanyName] = useState<string | null>(null)
-  
+  const [message, setMessage] = useState("");
+  const [isInsightsOpen, setIsInsightsOpen] = useState(false);
+  const [faqs, setFaqs] = useState<Faq[]>([]);
+  const [companyName, setCompanyName] = useState<string | null>(null);
+
   const {
     sessionId,
     companyId,
@@ -41,68 +48,80 @@ export default function ChatPage() {
     error,
     sendMessage,
     scrollRef,
-  } = useChat()
+  } = useChat();
 
   // Get company name from context
   useEffect(() => {
     const name = getActiveCompanyName();
-    setCompanyName(name || 'Your Company');
+    setCompanyName(name || "Your Company");
   }, []);
 
   // Load FAQs for knowledge panel
   useEffect(() => {
     const loadFaqs = async () => {
-      if (!companyId) return
-      const { data } = await apiFetch<Faq[]>(`/companies/${companyId}/faqs`)
+      if (!companyId) return;
+      const { data } = await apiFetch<Faq[]>(`/companies/${companyId}/faqs`);
       if (data && Array.isArray(data)) {
-        setFaqs(data.slice(0, 3)) // Top 3 FAQs
+        setFaqs(data.slice(0, 3)); // Top 3 FAQs
       }
-    }
-    loadFaqs()
-  }, [companyId])
+    };
+    loadFaqs();
+  }, [companyId]);
 
   const handleSend = async () => {
-    if (!message.trim() || sending || escalated) return
-    await sendMessage(message)
-    setMessage('')
-  }
+    if (!message.trim() || sending || escalated) return;
+    await sendMessage(message);
+    setMessage("");
+  };
 
   const handleQuickChip = (text: string) => {
-    setMessage((prev) => (prev ? `${prev} ${text}` : text))
-  }
+    setMessage((prev) => (prev ? `${prev} ${text}` : text));
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
+      e.preventDefault();
+      handleSend();
     }
-  }
+  };
 
   const formatTime = (isoString: string) => {
-    const date = new Date(isoString)
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-  }
+    const date = new Date(isoString);
+    return date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  };
 
   const InsightsPanel = () => (
     <div className="flex flex-col gap-6">
       {/* Summary Card */}
       <Card className="border-[#F3E3D7] bg-white">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-[#2B2B2B]">Summary</CardTitle>
+          <CardTitle className="text-base font-semibold text-[#2B2B2B]">
+            Summary
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {summary ? (
             <>
-              <p className="text-sm leading-relaxed text-[#6B6B6B]">{summary.summary}</p>
+              <p className="text-sm leading-relaxed text-[#6B6B6B]">
+                {summary.summary}
+              </p>
               <div className="flex items-center justify-between text-xs text-[#6B6B6B]">
                 <span>Last updated: {formatTime(summary.updatedAt)}</span>
-                <Badge variant="outline" className="border-[#F3E3D7] text-[#6B6B6B]">
+                <Badge
+                  variant="outline"
+                  className="border-[#F3E3D7] text-[#6B6B6B]"
+                >
                   auto
                 </Badge>
               </div>
             </>
           ) : (
-            <p className="text-sm text-[#6B6B6B] italic">No summary yet. Start chatting to generate one.</p>
+            <p className="text-sm text-[#6B6B6B] italic">
+              No summary yet. Start chatting to generate one.
+            </p>
           )}
         </CardContent>
       </Card>
@@ -120,20 +139,30 @@ export default function ChatPage() {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-[#6B6B6B]">Confidence</span>
-                <span className="font-medium text-[#2B2B2B]">{signals.confidence.toFixed(2)}</span>
+                <span className="font-medium text-[#2B2B2B]">
+                  {signals.confidence.toFixed(2)}
+                </span>
               </div>
               <Progress value={signals.confidence * 100} className="h-1.5" />
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-[#6B6B6B]">Retrieval</span>
-                <span className="font-medium text-[#2B2B2B]">{signals.retrievalScore.toFixed(2)}</span>
+                <span className="font-medium text-[#2B2B2B]">
+                  {signals.retrievalScore.toFixed(2)}
+                </span>
               </div>
-              <Progress value={signals.retrievalScore * 100} className="h-1.5" />
+              <Progress
+                value={signals.retrievalScore * 100}
+                className="h-1.5"
+              />
             </div>
           </div>
           <div className="text-xs text-[#6B6B6B]">
-            Session Confidence: <span className="font-medium text-[#2B2B2B]">{signals.sessionConfidence.toFixed(2)}</span>
+            Session Confidence:{" "}
+            <span className="font-medium text-[#2B2B2B]">
+              {signals.sessionConfidence.toFixed(2)}
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -149,15 +178,27 @@ export default function ChatPage() {
         <CardContent className="space-y-3">
           {faqs.length > 0 ? (
             faqs.map((faq) => (
-              <div key={faq.id} className="space-y-1.5 rounded-lg border border-[#F3E3D7] bg-[#FFF7F0] p-3">
+              <div
+                key={faq.id}
+                className="space-y-1.5 rounded-lg border border-[#F3E3D7] bg-[#FFF7F0] p-3"
+              >
                 <div className="flex items-start justify-between gap-2">
-                  <h4 className="text-sm font-medium text-[#2B2B2B]">{faq.question}</h4>
+                  <h4 className="text-sm font-medium text-[#2B2B2B]">
+                    {faq.question}
+                  </h4>
                 </div>
-                <p className="text-xs leading-relaxed text-[#6B6B6B]">{faq.answer.slice(0, 100)}{faq.answer.length > 100 ? '...' : ''}</p>
+                <p className="text-xs leading-relaxed text-[#6B6B6B]">
+                  {faq.answer.slice(0, 100)}
+                  {faq.answer.length > 100 ? "..." : ""}
+                </p>
                 {faq.tags && faq.tags.length > 0 && (
                   <div className="flex gap-1 flex-wrap">
                     {faq.tags.map((tag, i) => (
-                      <Badge key={i} variant="outline" className="text-xs border-[#F3E3D7] text-[#6B6B6B]">
+                      <Badge
+                        key={i}
+                        variant="outline"
+                        className="text-xs border-[#F3E3D7] text-[#6B6B6B]"
+                      >
                         {tag}
                       </Badge>
                     ))}
@@ -166,12 +207,14 @@ export default function ChatPage() {
               </div>
             ))
           ) : (
-            <p className="text-sm text-[#6B6B6B] italic">No FAQs available yet.</p>
+            <p className="text-sm text-[#6B6B6B] italic">
+              No FAQs available yet.
+            </p>
           )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 
   return (
     <div className="min-h-screen bg-[#FFF7F0]">
@@ -186,20 +229,37 @@ export default function ChatPage() {
           </div>
 
           <div className="flex flex-col items-center">
-            <h1 className="text-lg font-semibold text-[#2B2B2B]">Preview Chat</h1>
-            <p className="text-xs text-[#6B6B6B]">Try your AI assistant in a safe sandbox.</p>
+            <h1 className="text-lg font-semibold text-[#2B2B2B]">
+              Preview Chat
+            </h1>
+            <p className="text-xs text-[#6B6B6B]">
+              Try your AI assistant in a safe sandbox.
+            </p>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="hidden items-center gap-3 lg:flex">
-              <Badge className={escalated ? "bg-[#FFB020] text-white" : "bg-[#24A148] text-white hover:bg-[#24A148]/90"}>
-                {escalated ? 'Escalated' : 'Active'}
+              <Badge
+                className={
+                  escalated
+                    ? "bg-[#FFB020] text-white"
+                    : "bg-[#24A148] text-white hover:bg-[#24A148]/90"
+                }
+              >
+                {escalated ? "Escalated" : "Active"}
               </Badge>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#6B6B6B]">Session Confidence</span>
+                <span className="text-xs text-[#6B6B6B]">
+                  Session Confidence
+                </span>
                 <div className="flex items-center gap-1.5">
-                  <Progress value={signals.sessionConfidence * 100} className="h-1.5 w-16" />
-                  <span className="text-xs font-medium text-[#2B2B2B]">{signals.sessionConfidence.toFixed(2)}</span>
+                  <Progress
+                    value={signals.sessionConfidence * 100}
+                    className="h-1.5 w-16"
+                  />
+                  <span className="text-xs font-medium text-[#2B2B2B]">
+                    {signals.sessionConfidence.toFixed(2)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -209,7 +269,10 @@ export default function ChatPage() {
                   <PieChart className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[90vw] max-w-md overflow-y-auto bg-[#FFF7F0] sm:w-[400px]">
+              <SheetContent
+                side="right"
+                className="w-[90vw] max-w-md overflow-y-auto bg-[#FFF7F0] sm:w-[400px]"
+              >
                 <div className="mt-6">
                   <InsightsPanel />
                 </div>
@@ -227,7 +290,8 @@ export default function ChatPage() {
             {/* Session Strip */}
             <div className="border-b border-[#F3E3D7] px-6 py-3">
               <p className="text-sm text-[#6B6B6B]">
-                {companyName || 'Loading...'} • {sessionId || 'Loading...'} • {localStorage.getItem('sessionId') ? 'User Session' : 'Guest'}
+                {companyName || "Loading..."} • {" "}
+                {localStorage.getItem("sessionId") ? "User Session" : "Guest"}
               </p>
             </div>
 
@@ -243,39 +307,11 @@ export default function ChatPage() {
                     <p>No messages yet. Start the conversation!</p>
                   </div>
                 ) : (
-                  messages.map((msg) => (
-                    <div key={msg.id} className={`flex gap-3 ${msg.sender === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className={msg.sender === "user" ? "bg-[#FF7A1A] text-white" : "bg-[#F3E3D7]"}>
-                          {msg.sender === "user" ? "U" : "O"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div
-                        className={`flex max-w-[70%] flex-col gap-1 ${msg.sender === "user" ? "items-end" : "items-start"}`}
-                      >
-                        <div
-                          className={`rounded-2xl px-4 py-2.5 ${
-                            msg.sender === "user" ? "bg-[#FF7A1A] text-white" : "bg-[#FFF7F0] text-[#2B2B2B]"
-                          }`}
-                        >
-                          <p className="text-sm leading-relaxed">{msg.text}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-[#6B6B6B]">{formatTime(msg.createdAt)}</span>
-                          {msg.sender === "bot" && msg.confidence !== undefined && (
-                            <>
-                              <Badge variant="outline" className="h-5 border-[#F3E3D7] text-xs text-[#6B6B6B]">
-                                C: {msg.confidence.toFixed(2)}
-                              </Badge>
-                              <Badge variant="outline" className="h-5 border-[#F3E3D7] text-xs text-[#6B6B6B]">
-                                R: {msg.retrievalScore?.toFixed(2) || 'N/A'}
-                              </Badge>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))
+                  <>
+                    {messages.map((msg) => (
+                      <ChatMessage key={msg.id} message={msg} />
+                    ))}
+                  </>
                 )}
                 <div ref={scrollRef} />
               </div>
@@ -322,18 +358,26 @@ export default function ChatPage() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={escalated ? "Chat is escalated" : "Type a message…"}
+                    placeholder={
+                      escalated ? "Chat is escalated" : "Type a message…"
+                    }
                     disabled={sending || escalated || loading}
                     className="min-h-[80px] resize-none border-[#F3E3D7] bg-[#FFF7F0] text-[#2B2B2B] placeholder:text-[#6B6B6B] focus-visible:ring-[#FF7A1A] disabled:opacity-50"
                   />
                   <Button
                     onClick={handleSend}
                     size="icon"
-                    disabled={sending || escalated || loading || !message.trim()}
+                    disabled={
+                      sending || escalated || loading || !message.trim()
+                    }
                     className="h-[80px] w-12 shrink-0 bg-[#FF7A1A] hover:bg-[#FF7A1A]/90 disabled:opacity-50"
                     aria-label="Send message"
                   >
-                    {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                    {sending ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Send className="h-5 w-5" />
+                    )}
                   </Button>
                 </div>
               </div>
@@ -347,5 +391,5 @@ export default function ChatPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

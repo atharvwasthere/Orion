@@ -12,13 +12,27 @@ import { ensureCompanyId, createSession } from '@/lib/ensureCompanyId';
  * directly with apiFetch() instead of using this hook.
  */
 
+export type MessageMeta = {
+  type?: string;
+  title?: string;
+  sections?: Array<{
+    label: string;
+    content: string;
+  }>;
+  contextUsed?: string[];
+  confidence?: number;
+  tone?: string;
+  shouldEscalate?: boolean;
+};
+
 export type Message = {
   id: string;
-  sender: 'user' | 'bot';
+  sender: 'user' | 'bot' | 'orion' | 'system';
   text: string;
   createdAt: string;
   confidence?: number;
   retrievalScore?: number;
+  meta?: MessageMeta;
 };
 
 export type TurnResponse = {
@@ -84,8 +98,8 @@ export function useChat() {
         }
         setSessionId(sId);
 
-        // Load messages
-        await loadMessages(sId);
+        // Load messages + session signals
+        await loadMessages(sId, cId);
         
         // Load summary
         await loadSummary(sId);
@@ -100,25 +114,47 @@ export function useChat() {
     init();
   }, []);
 
-  // Load messages
-  const loadMessages = async (sId: string) => {
+  // Load messages and hydrate signals
+  const loadMessages = async (sId: string, cId?: string) => {
     const { data, error: err } = await apiFetch<Message[]>(`/sessions/${sId}/messages`);
     if (err) {
       console.error('Failed to load messages:', err);
       return;
     }
+
     if (data && Array.isArray(data)) {
       setMessages(data);
-      
-      // Update signals from last bot message
-      const lastBotMsg = [...data].reverse().find((m) => m.sender === 'bot');
-      if (lastBotMsg && lastBotMsg.confidence !== undefined) {
-        setSignals({
-          confidence: lastBotMsg.confidence,
-          retrievalScore: lastBotMsg.retrievalScore || 0,
-          sessionConfidence: signals.sessionConfidence, // Keep existing or update from session
-        });
+
+      // Prefer latest non-user message ('orion' or 'bot')
+      const lastAssistantMsg = [...data]
+        .reverse()
+        .find((m) => m.sender === 'orion' || m.sender === 'bot');
+
+      // Fetch session to hydrate sessionConfidence
+      let sessionConfidenceFromApi: number | undefined = undefined;
+      if (cId) {
+        const sess = await apiFetch<{ sessionConfidence?: number }>(
+          `/companies/${cId}/sessions/${sId}`
+        );
+        if (sess.data && typeof sess.data.sessionConfidence === 'number') {
+          sessionConfidenceFromApi = sess.data.sessionConfidence;
+        }
       }
+
+      setSignals((prev) => ({
+        confidence:
+          (lastAssistantMsg && typeof lastAssistantMsg.confidence === 'number'
+            ? lastAssistantMsg.confidence
+            : prev.confidence) || 0,
+        retrievalScore:
+          (lastAssistantMsg && typeof lastAssistantMsg.retrievalScore === 'number'
+            ? lastAssistantMsg.retrievalScore
+            : prev.retrievalScore) || 0,
+        sessionConfidence:
+          typeof sessionConfidenceFromApi === 'number'
+            ? sessionConfidenceFromApi
+            : prev.sessionConfidence,
+      }));
     }
   };
 
