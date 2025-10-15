@@ -30,6 +30,7 @@ model Session {
   status            String   @default("active") // "active" | "escalated" | "closed"
   escalationReason  String?  // 'low_confidence' | 'out_of_scope' | 'policy' | 'tool_error'
   sessionConfidence Float    @default(1.0)
+  confidences       Float[]  @default([]) // Rolling history of turn confidences
   badTurns          Int      @default(0)
   goodTurns         Int      @default(0)
   oosStreak         Int      @default(0)
@@ -49,7 +50,8 @@ model Message {
   sessionId  String
   sender     String     // "user" | "orion" | "system"
   text       String
-  confidence Float?     // optional, if you store model confidence
+  confidence Float?     // Turn confidence score
+  mode       String?    // "confident" | "cautious" | "unsure" | "escalate"
   createdAt  DateTime   @default(now())
   session    Session    @relation(fields: [sessionId], references: [id])
   @@index([sessionId, createdAt])
