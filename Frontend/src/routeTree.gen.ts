@@ -13,6 +13,7 @@ import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoIndexRouteImport } from './routes/demo/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as ChatIndexRouteImport } from './routes/chat/index'
 import { Route as DashboardSetupRouteImport } from './routes/dashboard/setup'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardFaqsRouteImport } from './routes/dashboard/faqs'
@@ -40,6 +41,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
+} as any)
+const ChatIndexRoute = ChatIndexRouteImport.update({
+  id: '/chat/',
+  path: '/chat/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardSetupRoute = DashboardSetupRouteImport.update({
   id: '/setup',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/faqs': typeof DashboardFaqsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/setup': typeof DashboardSetupRoute
+  '/chat': typeof ChatIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/demo': typeof DemoIndexRoute
   '/dashboard/conversations/$id': typeof DashboardConversationsIdRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/dashboard/faqs': typeof DashboardFaqsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/setup': typeof DashboardSetupRoute
+  '/chat': typeof ChatIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/demo': typeof DemoIndexRoute
   '/dashboard/conversations/$id': typeof DashboardConversationsIdRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/dashboard/faqs': typeof DashboardFaqsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/setup': typeof DashboardSetupRoute
+  '/chat/': typeof ChatIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/demo/': typeof DemoIndexRoute
   '/dashboard/conversations/$id': typeof DashboardConversationsIdRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/dashboard/faqs'
     | '/dashboard/settings'
     | '/dashboard/setup'
+    | '/chat'
     | '/dashboard/'
     | '/demo'
     | '/dashboard/conversations/$id'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/dashboard/faqs'
     | '/dashboard/settings'
     | '/dashboard/setup'
+    | '/chat'
     | '/dashboard'
     | '/demo'
     | '/dashboard/conversations/$id'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/dashboard/faqs'
     | '/dashboard/settings'
     | '/dashboard/setup'
+    | '/chat/'
     | '/dashboard/'
     | '/demo/'
     | '/dashboard/conversations/$id'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  ChatIndexRoute: typeof ChatIndexRoute
   DemoIndexRoute: typeof DemoIndexRoute
 }
 
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
+    }
+    '/chat/': {
+      id: '/chat/'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/dashboard/setup': {
       id: '/dashboard/setup'
@@ -276,6 +296,7 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  ChatIndexRoute: ChatIndexRoute,
   DemoIndexRoute: DemoIndexRoute,
 }
 export const routeTree = rootRouteImport
