@@ -5,6 +5,17 @@
 **Orion** is a multi-tenant, context-aware customer support assistant.
 It blends **hybrid retrieval**, **structured LLM reasoning**, and **adaptive confidence tracking** to power human-grade chat experiences for small businesses.
 
+<img width="1919" height="902" alt="image" src="https://github.com/user-attachments/assets/09d5aa4f-2318-4073-a711-bfa900bed6a9" />
+
+<img width="1919" height="1073" alt="image" src="https://github.com/user-attachments/assets/d4346b7c-a99a-46bd-bb45-d6143abc49a5" />
+<img width="1919" height="1070" alt="image" src="https://github.com/user-attachments/assets/2d20a184-472d-4ff4-b442-39e3d5f34638" />
+<img width="1919" height="1073" alt="image" src="https://github.com/user-attachments/assets/c83fb609-7660-4c54-ac14-0c37d0e218fd" />
+<img width="1919" height="1074" alt="image" src="https://github.com/user-attachments/assets/8d97f845-c628-46d2-a8b2-e106dab096bc" />
+<img width="1919" height="1074" alt="image" src="https://github.com/user-attachments/assets/8abc446a-b383-4df7-8be3-4a857f43ce27" />
+<img width="1919" height="1078" alt="image" src="https://github.com/user-attachments/assets/ba279863-beaf-4fc5-9c3c-f7ad655bc424" />
+<img width="1919" height="1073" alt="image" src="https://github.com/user-attachments/assets/2480ef9e-47ba-4688-9f76-936a340c6612" />
+<img width="1919" height="1078" alt="image" src="https://github.com/user-attachments/assets/47ae4df9-173b-4526-88e7-936369505016" />
+
 ---
 
 ## 🏗️ System Overview
