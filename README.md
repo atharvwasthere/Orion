@@ -5,7 +5,6 @@
 **Orion** is a multi-tenant, context-aware customer support assistant.
 It blends **hybrid retrieval**, **structured LLM reasoning**, and **adaptive confidence tracking** to power human-grade chat experiences for small businesses
 
-- Video Demo Link : https://drive.google.com/drive/folders/1D9FPSKgzO_YNrxyyZr_P5GOZiycOHyeO?usp=sharing
 <img width="1919" height="902" alt="image" src="https://github.com/user-attachments/assets/09d5aa4f-2318-4073-a711-bfa900bed6a9" />
 
 <img width="1919" height="1073" alt="image" src="https://github.com/user-attachments/assets/d4346b7c-a99a-46bd-bb45-d6143abc49a5" />
