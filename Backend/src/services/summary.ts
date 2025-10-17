@@ -38,7 +38,10 @@ export async function generateSessionSummary(sessionId: string): Promise<string>
       .join('\n');
 
     // Create summary prompt
-    const summaryPrompt = `You are a professional support analyst. Generate a concise 2-3 sentence summary of this customer support conversation.
+    const summaryPrompt = `You are a professional support analyst.
+    You are summarizing an ongoing customer support conversation.
+    
+    Generate a concise 2-3 sentence summary of this customer support conversation.
 
 Focus on:
 - Main issue/question raised by customer
@@ -75,7 +78,7 @@ Summary:`;
  * Check if session should auto-generate summary based on message count
  */
 export async function shouldGenerateSummary(sessionId: string): Promise<boolean> {
-  const summaryInterval = parseInt(process.env.SUMMARY_INTERVAL ?? '8', 10);
+  const summaryInterval = parseInt(process.env.SUMMARY_INTERVAL ?? '2', 10);
   
   const messageCount = await prisma.message.count({
     where: {
