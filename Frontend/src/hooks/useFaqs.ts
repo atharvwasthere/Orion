@@ -96,16 +96,27 @@ export async function deleteFaq(faqId: string) {
 
 /**
  * Bulk upload FAQs from JSON array
+ * Uses optimized bulk endpoint that generates embeddings in parallel
+ * and triggers company profile generation only once
  */
 export async function bulkUploadFaqs(faqs: CreateFAQInput[]) {
   const companyId = await ensureCompanyId();
   
-  const results = await Promise.allSettled(
-    faqs.map(faq => createFaq(faq))
+  const { data, error } = await apiFetch<{ created: number; faqs: FAQ[] }>(
+    `/companies/${companyId}/faqs/bulk`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ faqs }),
+    }
   );
 
-  const successful = results.filter(r => r.status === 'fulfilled').length;
-  const failed = results.filter(r => r.status === 'rejected').length;
+  if (error) {
+    throw new Error(error);
+  }
 
-  return { successful, failed, total: faqs.length };
+  return { 
+    successful: data?.created || 0, 
+    failed: faqs.length - (data?.created || 0), 
+    total: faqs.length 
+  };
 }

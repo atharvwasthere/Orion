@@ -25,7 +25,7 @@ export interface HybridContext {
 export async function getHybridContext(
   companyId: string,
   query: string,
-  topK: number = 3
+  topK: number = 10
 ): Promise<HybridContext> {
   try {
     // 1. Fetch company profile (condensed global context)

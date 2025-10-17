@@ -94,30 +94,40 @@ export default function SetupPage() {
     if (parsedFaqs.length === 0) return
 
     setImporting(true)
-    const results: FaqResult[] = []
     const companyId = await ensureCompanyId()
 
-    // Import with concurrency 5
-    const batchSize = 5
-    for (let i = 0; i < parsedFaqs.length; i += batchSize) {
-      const batch = parsedFaqs.slice(i, i + batchSize)
-      const promises = batch.map(async (item) => {
-        const { error } = await apiFetch(`/companies/${companyId}/faqs`, {
-          method: 'POST',
-          body: JSON.stringify(item),
-        })
-        return { item, success: !error, error }
+    try {
+      // Use bulk upload endpoint (single request, single Gemini call)
+      const { error } = await apiFetch(`/companies/${companyId}/faqs/bulk`, {
+        method: 'POST',
+        body: JSON.stringify({ faqs: parsedFaqs }),
       })
-      const batchResults = await Promise.all(promises)
-      results.push(...batchResults)
-      setImportResults([...results]) // Update progress
-    }
 
-    setImporting(false)
-    const successCount = results.filter((r) => r.success).length
-    if (successCount === results.length) {
-      setCompleted(1, true)
-      setTimeout(() => setOpenStep(null), 1000)
+      if (error) {
+        const results: FaqResult[] = parsedFaqs.map(item => ({
+          item,
+          success: false,
+          error,
+        }))
+        setImportResults(results)
+      } else {
+        const results: FaqResult[] = parsedFaqs.map(item => ({
+          item,
+          success: true,
+        }))
+        setImportResults(results)
+        setCompleted(1, true)
+        setTimeout(() => setOpenStep(null), 1000)
+      }
+    } catch (err: any) {
+      const results: FaqResult[] = parsedFaqs.map(item => ({
+        item,
+        success: false,
+        error: err.message || 'Upload failed',
+      }))
+      setImportResults(results)
+    } finally {
+      setImporting(false)
     }
   }
 
