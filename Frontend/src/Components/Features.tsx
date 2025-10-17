@@ -9,7 +9,7 @@ export default function Features() {
         {/* 12-col grid -> 2/3 : 1/3 → 1/3 : 1/3 : 1/3 → 1/3 : 2/3 */}
         <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-6 auto-rows-[200px]">
           {/* A — 2/3 (lg:col-span-8) */}
-          <Card className="lg:col-span-8 rounded-2xl border-2 hover:border-primary/50 transition">
+          <Card className="lg:col-span-8 rounded-2xl border-2  transition">
             <CardContent className="p-6 h-full flex flex-col justify-between">
               <div>
                 <h3 className="font-display text-xl font-semibold mb-2">Always thinking for you</h3>
@@ -40,7 +40,7 @@ export default function Features() {
               { title: "Mobile friendly", desc: "Dashboards that fit any screen." },
               { title: "Powered by AI", desc: "Confidence-based responses & smart escalation." },
             ].map((x) => (
-              <Card key={x.title} className="rounded-2xl border-2 hover:border-primary/50 transition">
+              <Card key={x.title} className="rounded-2xl border-2  transition">
                 <CardContent className="p-5 -mt-4">
                   <h4 className="text-sm font-semibold mb-1">{x.title}</h4>
                   <p className="text-xs text-muted-foreground">{x.desc}</p>
@@ -50,7 +50,7 @@ export default function Features() {
           </div>
 
           {/* C — 1/3 */}
-          <Card className="lg:col-span-4 rounded-2xl border-2 hover:border-primary/50 transition">
+          <Card className="lg:col-span-4 rounded-2xl border-2  transition">
             <CardContent className="p-6 h-full flex flex-col justify-between">
               <div>
                 <h3 className="font-display text-xl font-semibold mb-2">Manage any workflow</h3>
@@ -74,7 +74,7 @@ export default function Features() {
           </Card>
 
           {/* D — 1/3 */}
-<Card className="lg:col-span-4 rounded-2xl border-2 hover:border-primary/50 transition">
+<Card className="lg:col-span-4 rounded-2xl border-2  transition">
   <CardContent className="p-6 h-full flex flex-col justify-between">
     <div>
       <h3 className="font-display text-lg font-semibold mb-2">Always in the loop</h3>
@@ -94,7 +94,7 @@ export default function Features() {
 </Card>
 
           {/* E — 1/3 */}
-<Card className="lg:col-span-4 mt-12 rounded-2xl border-2 hover:border-primary/50 transition bg-gradient-to-br from-primary/5 to-accent/5">
+<Card className="lg:col-span-4 mt-12 rounded-2xl border-2  transition bg-gradient-to-br from-primary/5 to-accent/5">
   <CardContent className="p-6 h-full flex flex-col items-center justify-center text-center">
     <FeatureIcon type="lightning" className="w-10 h-60 mb-2" />
     <h3 className="font-display text-2xl font-bold mb-1">One Platform</h3>
@@ -111,7 +111,7 @@ export default function Features() {
               { title: "Payment handling", desc: "Refunds & billing inside chat." },
               { title: "Meeting scheduling", desc: "Suggest & confirm slots instantly." },
             ].map((c) => (
-              <Card key={c.title} className="rounded-2xl border-2 hover:border-primary/50 transition">
+              <Card key={c.title} className="rounded-2xl border-2  transition">
                 <CardContent className="p-5 -mt-4">
                   <h4 className="text-sm font-semibold mb-1">{c.title}</h4>
                   <p className="text-xs text-muted-foreground">{c.desc}</p>
@@ -123,7 +123,7 @@ export default function Features() {
           {/* G — 2/3 (lg:col-span-8) -> split inside 1:2 */}
           <div className="lg:col-span-8 mt-12 -mb-12 grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* 1/3 */}
-            <Card className="lg:col-span-1  rounded-2xl border-2 hover:border-primary/50 transition">
+            <Card className="lg:col-span-1  rounded-2xl border-2  transition">
               <CardContent className="p-6 h-full flex flex-col items-center justify-center text-center">
                 <h3 className="font-display text-lg font-semibold mb-2">Customer Portal</h3>
                 <p className="text-xs text-muted-foreground mb-3">
@@ -136,7 +136,7 @@ export default function Features() {
             </Card>
 
             {/* 2/3 */}
-            <Card className="lg:col-span-2 rounded-2xl border-2 hover:border-primary/50 transition">
+            <Card className="lg:col-span-2 rounded-2xl border-2  transition">
               <CardContent className="p-6 h-full flex flex-col justify-center">
                 <h3 className="font-display text-xl font-semibold mb-2">Portals for all</h3>
                 <p className="text-sm text-muted-foreground">

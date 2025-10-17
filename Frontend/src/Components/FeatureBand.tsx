@@ -1,9 +1,7 @@
-import * as React from "react"
-
 type FeatureItem = {
   title?: string
   description: string
-  icon?: React.ReactNode
+  icon?: string // path to imported SVG
 }
 
 type FeatureBandProps = {
@@ -12,6 +10,7 @@ type FeatureBandProps = {
   items: readonly [FeatureItem, FeatureItem, FeatureItem]
   className?: string
 }
+
 /**
  * FeatureBand — big headline on left, three compact features on right.
  * Responsive: single column on mobile, 12-col grid on lg+.
@@ -45,12 +44,19 @@ export function FeatureBand({ id, headline, items, className }: FeatureBandProps
               {items.map((item, i) => (
                 <li key={i} className="max-w-xs">
                   <div className="mb-4 h-10 w-10 select-none">
-                    {/* Default icon = simple blue glyph; replace with lucide if you like */}
-                    {item.icon ?? <DefaultGlyph idx={i} />}
+                    {item.icon ? (
+                      <img
+                        src={item.icon}
+                        alt={item.title || `feature-${i}`}
+                        className="h-10 w-10"
+                      />
+                    ) : (
+                      <DefaultGlyph idx={i} />
+                    )}
                   </div>
-                  {item.title ? (
+                  {item.title && (
                     <h3 className="text-lg font-semibold mb-1">{item.title}</h3>
-                  ) : null}
+                  )}
                   <p className="text-base leading-relaxed text-muted-foreground">
                     {item.description}
                   </p>
@@ -64,14 +70,11 @@ export function FeatureBand({ id, headline, items, className }: FeatureBandProps
   )
 }
 
-/** tiny decorative blue glyphs — swap with lucide icons if installed */
+/** tiny decorative blue glyphs — fallback if no SVG provided */
 function DefaultGlyph({ idx = 0 }: { idx?: number }) {
   const seeds = [
-    // sparkle
     "M12 2l1.8 4.6L18 8l-4.2 1.4L12 14l-1.8-4.6L6 8l4.2-1.4L12 2z",
-    // feather
     "M4 20c8-1 14-7 14-14v0c-4 0-8 2-11 5S4 16 4 20z",
-    // orb stripes
     "M4 12a8 8 0 1 0 16 0H4zm0-3a8 8 0 0 1 16 0H4zm0 6a8 8 0 0 0 16 0H4z",
   ]
   const d = seeds[idx % seeds.length]
