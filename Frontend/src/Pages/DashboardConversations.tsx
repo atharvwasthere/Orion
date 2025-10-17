@@ -40,11 +40,13 @@ export default function ConversationDetailPage() {
         if (messagesError) throw new Error(messagesError);
         if (messagesData) setMessages(messagesData);
 
-        // Fetch summary (optional)
-        const { data: summaryData } = await apiFetch<Summary>(
-          `/sessions/${sessionId}/summary`
-        );
-        if (summaryData) setSummary(summaryData);
+        // Only fetch summary if messages exist
+        if (messagesData && messagesData.length > 0) {
+          const { data: summaryData } = await apiFetch<Summary>(
+            `/sessions/${sessionId}/summary`
+          );
+          if (summaryData) setSummary(summaryData);
+        }
 
         // Fetch session info (if available)
         const { data: sessionData } = await apiFetch<Session>(

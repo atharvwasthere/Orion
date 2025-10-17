@@ -112,10 +112,12 @@ export function useChat() {
         setSessionId(sId);
 
         // Load messages + session signals
-        await loadMessages(sId, cId);
+        const messageCount = await loadMessages(sId, cId);
         
-        // Load summary
-        await loadSummary(sId);
+        // Only load summary if messages exist
+        if (messageCount > 0) {
+          await loadSummary(sId);
+        }
       } catch (err: any) {
         setError(err.message || 'Failed to initialize chat');
         console.error('Chat init error:', err);
@@ -128,11 +130,11 @@ export function useChat() {
   }, []);
 
   // Load messages and hydrate signals
-  const loadMessages = async (sId: string, cId?: string) => {
+  const loadMessages = async (sId: string, cId?: string): Promise<number> => {
     const { data, error: err } = await apiFetch<Message[]>(`/sessions/${sId}/messages`);
     if (err) {
       console.error('Failed to load messages:', err);
-      return;
+      return 0;
     }
 
     if (data && Array.isArray(data)) {
@@ -168,7 +170,10 @@ export function useChat() {
             ? sessionConfidenceFromApi
             : prev.sessionConfidence,
       }));
+      
+      return data.length;
     }
+    return 0;
   };
 
   // Load summary
