@@ -154,7 +154,8 @@ export default function SetupPage() {
       alert('Please complete Step 2 first to create a session')
       return
     }
-    const w = window.open("/chat", "_blank", "noopener,noreferrer")
+    const url = `/chat?sessionId=${encodeURIComponent(sessionId)}`
+    const w = window.open(url, "_blank", "noopener,noreferrer")
     try { w?.focus() } catch {}
     setCompleted(3, true)
     setOpenStep(null)

@@ -14,17 +14,17 @@ export async function geminiLLM({
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY not configured");
     }
-    
+
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
+    const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash' // Using Gemini 2.5 Flash model
     });
 
     // Format FAQs for context
-    const faqText = knowledge.length > 0 
+    const faqText = knowledge.length > 0
       ? knowledge
-          .map((f) => `Q: ${f.question}\nA: ${f.answer}`)
-          .join("\n\n")
+        .map((f) => `Q: ${f.question}\nA: ${f.answer}`)
+        .join("\n\n")
       : "(no FAQs available)";
 
     // Build system prompt
@@ -85,30 +85,53 @@ export async function geminiLLM({
     const result = await chat.sendMessage(lastUserMessage.text);
     const response = result.response;
     const text = response.text();
+    const userText = lastUserMessage.text.toLowerCase();
+    const likelyCompanyIntro =
+      userText.includes("what does this") ||
+      userText.includes("what does the company") ||
+      userText.includes("about") ||
+      userText.includes("specialize");
+
+    const faqOverlap = knowledge.some(faq => {
+      if (!faq.answer) return false;
+      const firstWords = faq.answer
+        .toLowerCase()
+        .replace(/[.,]/g, '')
+        .split(/\s+/)
+        .slice(0, 10)
+        .join(' ');
+      return text.toLowerCase().includes(firstWords);
+    });
+
+
+
+
 
     // Calculate confidence based on response characteristics
     // Gemini doesn't provide confidence scores, so we'll use heuristics
-    let confidence = 0.7; // Base confidence
+    let confidence = 0.85; // base
 
     // Adjust confidence based on response patterns
-    if (text.toLowerCase().includes("i'm not sure") || 
-        text.toLowerCase().includes("i don't know") ||
-        text.toLowerCase().includes("unclear")) {
-      confidence = 0.3;
-    } else if (knowledge.length > 0 && 
-               knowledge.some(faq => 
-                 text.toLowerCase().includes(faq.answer.toLowerCase().substring(0, 20)))) {
-      // Higher confidence if response references FAQ content
+    if (likelyCompanyIntro && faqOverlap) {
+      confidence = 0.95; // obvious company intro match
+    } else if (faqOverlap) {
       confidence = 0.9;
+    } else if (text.toLowerCase().includes("i'm not sure") ||
+      text.toLowerCase().includes("i don't know") ||
+      text.toLowerCase().includes("unclear")) {
+      confidence = 0.3;
     } else if (text.toLowerCase().includes("based on") ||
-               text.toLowerCase().includes("according to")) {
+      text.toLowerCase().includes("according to")) {
       confidence = 0.8;
     }
 
+
+
+
     // Get token usage if available
     const usage = response.usageMetadata ? {
-      total: (response.usageMetadata.promptTokenCount || 0) + 
-             (response.usageMetadata.candidatesTokenCount || 0)
+      total: (response.usageMetadata.promptTokenCount || 0) +
+        (response.usageMetadata.candidatesTokenCount || 0)
     } : { total: 0 };
 
     return {
@@ -118,7 +141,7 @@ export async function geminiLLM({
     };
   } catch (error) {
     console.error("Gemini LLM Error:", error);
-    
+
     // Fallback response on error
     return {
       text: "I apologize, but I'm experiencing technical difficulties. Please try again or contact human support if the issue persists.",

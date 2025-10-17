@@ -85,17 +85,30 @@ export function useChat() {
         const cId = await ensureCompanyId();
         setCompanyId(cId);
 
-        // Get or create session, ensuring it belongs to current company
-        let sId = localStorage.getItem('sessionId');
-        const sessionCompanyId = localStorage.getItem('sessionCompanyId');
+        // Prefer sessionId from URL first (passed from setup page)
+        const params = new URLSearchParams(window.location.search);
+        let sId = params.get('sessionId');
 
-        // If no session OR session belongs to different company, create new one
-        if (!sId || sessionCompanyId !== cId) {
-          console.log('[useChat] Creating new session for company:', cId);
-          sId = await createSession('guest@example.com');
-          // Store the company this session belongs to
+        if (sId) {
+          // Persist provided session and bind to company
+          localStorage.setItem('sessionId', sId);
           localStorage.setItem('sessionCompanyId', cId);
+        } else {
+          // Fallback to localStorage
+          sId = localStorage.getItem('sessionId');
+          const sessionCompanyId = localStorage.getItem('sessionCompanyId');
+
+          // If no session OR session belongs to different company, create new one
+          if (!sId || sessionCompanyId !== cId) {
+            console.log('[useChat] Creating new session for company:', cId);
+            sId = await createSession('guest@example.com');
+            // Store the company this session belongs to
+            localStorage.setItem('sessionCompanyId', cId);
+            // createSession already persists sessionId, but keep state consistent
+            localStorage.setItem('sessionId', sId);
+          }
         }
+
         setSessionId(sId);
 
         // Load messages + session signals

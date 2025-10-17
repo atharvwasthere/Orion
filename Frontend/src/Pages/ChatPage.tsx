@@ -290,8 +290,8 @@ export default function ChatPage() {
             {/* Session Strip */}
             <div className="border-b border-[#F3E3D7] px-6 py-3">
               <p className="text-sm text-[#6B6B6B]">
-                {companyName || "Loading..."} • {" "}
-                {localStorage.getItem("sessionId") ? "User Session" : "Guest"}
+                {companyName || "Loading..."} •{" "}
+                {sessionId ? "User Session" : "Guest"}
               </p>
             </div>
 
