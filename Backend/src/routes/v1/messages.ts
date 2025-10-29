@@ -1,18 +1,19 @@
 import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
-import { prisma } from "../../config/prisma.ts";
-import { generate } from "../../llm/adapter.ts";
+import { prisma } from "../../config/prisma.js";
+import type { Message } from '@prisma/client';
+import { generate } from "../../llm/adapter.js";
 import {
   updateSessionConfidence,
   shouldEscalateLowConfidence,
   updateOOSStreak,
   isOOS,
-} from "../../services/confidence.ts";
-import { deriveUserFeedback, detectRepeatQuestion } from "../../services/helpers.ts";
-import { faqRetrievalScore, cheapOOSClassifier } from "../../services/retrieval.ts";
-import { shouldGenerateSummary, updateSessionSummary } from "../../services/summary.ts";
-import { getHybridContext, formatHybridContext } from "../../services/hybridContext.ts";
-import { generateStructured } from "../../llm/structuredGenerate.ts";
+} from "../../services/confidence.js";
+import { deriveUserFeedback, detectRepeatQuestion } from "../../services/helpers.js";
+import { faqRetrievalScore, cheapOOSClassifier } from "../../services/retrieval.js";
+import { shouldGenerateSummary, updateSessionSummary } from "../../services/summary.js";
+import { getHybridContext, formatHybridContext } from "../../services/hybridContext.js";
+import { generateStructured } from "../../llm/structuredGenerate.js";
 
 const router = Router({ mergeParams: true }); // mergeParams to access sessionId from parent route
 
@@ -124,7 +125,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     });
 
     // Phase 3: LLM Orchestration - Generate intelligent response if sender is user
-    let botMsg = null;
+    let botMsg: Message | null = null;
     let shouldEscalate = false;
 
     if (sender === "user") {

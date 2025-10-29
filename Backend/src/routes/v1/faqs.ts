@@ -1,8 +1,8 @@
 import { Router} from "express";
 import type { Request, Response, NextFunction } from "express";
-import { prisma } from "../../config/prisma.ts";
-import { embedFAQText } from "../../lib/embeddings.ts";
-import { generateCompanyProfile } from "../../lib/companyProfile.ts";
+import { prisma } from "../../config/prisma.js";
+import { embedFAQText } from "../../lib/embeddings.js";
+import { generateCompanyProfile } from "../../lib/companyProfile.js";
 
 const router = Router({ mergeParams: true }); // mergeParams to access companyId from parent route
 

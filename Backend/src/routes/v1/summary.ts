@@ -1,6 +1,6 @@
 import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
-import { prisma } from "../../config/prisma.ts";
+import { prisma } from "../../config/prisma.js";
 
 const router = Router({ mergeParams: true }); // mergeParams to access sessionId from parent route
 

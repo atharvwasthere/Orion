@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { createServer } from '../server.ts';
+import { createServer } from '../server.js';
 
 describe('Health Endpoint', () => {
   const app = createServer();

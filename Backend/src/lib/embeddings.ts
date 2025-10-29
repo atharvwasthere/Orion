@@ -43,8 +43,17 @@ export async function embedQueryText(text: string) {
   return normalize(embedding);
 }
 
-export function getBestMatch(queryVec: number[], faqs: any[]) {
-  let best = null;
+interface FAQItemWithEmbedding {
+  embedding: number[];
+  [key: string]: any; // Allow other properties
+}
+
+interface BestMatch extends FAQItemWithEmbedding {
+  score: number;
+}
+
+export function getBestMatch(queryVec: number[], faqs: FAQItemWithEmbedding[]) {
+  let best: BestMatch | null = null;
   for (const f of faqs) {
     if (!Array.isArray(f.embedding)) continue;
     const score = cosineSimilarity(queryVec, f.embedding);

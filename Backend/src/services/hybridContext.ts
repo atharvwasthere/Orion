@@ -1,5 +1,5 @@
-import { prisma } from '../config/prisma.ts';
-import { embedQueryText } from '../lib/embeddings.ts';
+import { prisma } from '../config/prisma.js';
+import { embedQueryText } from '../lib/embeddings.js';
 
 /**
  * Phase 5: Hybrid Context Retrieval

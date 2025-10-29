@@ -1,10 +1,10 @@
 import { Router } from "express";
-import companies from "./v1/companies.ts";
-import faqs from "./v1/faqs.ts";
-import sessions from "./v1/sessions.ts";
-import messages from "./v1/messages.ts";
-import summary from "./v1/summary.ts";
-import health from "./v1/health.ts";
+import companies from "./v1/companies.js";
+import faqs from "./v1/faqs.js";
+import sessions from "./v1/sessions.js";
+import messages from "./v1/messages.js";
+import summary from "./v1/summary.js";
+import health from "./v1/health.js";
 
 export const router = Router();
 

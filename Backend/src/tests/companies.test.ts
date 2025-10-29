@@ -1,6 +1,6 @@
 import request from 'supertest';
-import { createServer } from '../server.ts';
-import { prisma } from '../config/prisma.ts';
+import { createServer } from '../server.js';
+import { prisma } from '../config/prisma.js';
 
 describe('Companies API', () => {
   const app = createServer();

@@ -19,8 +19,9 @@
     "moduleResolution": "Bundler",   //  helps resolve .ts/.js imports cleanly
     "resolveJsonModule": true,       //  allows importing JSON if needed
     /*  enable direct .ts imports */
-    "allowImportingTsExtensions": true,
-    "noEmit": true,    
+    "allowImportingTsExtensions": false,
+    "noEmit": false,    
+    "noImplicitAny": false,
 
     // Other Outputs
     "sourceMap": true,

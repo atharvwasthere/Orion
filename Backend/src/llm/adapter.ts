@@ -1,5 +1,5 @@
-import { geminiLLM } from "./providers/gemini.ts";
-import { mockLLM } from "./providers/mock.ts";
+import { geminiLLM } from "./providers/gemini.js";
+import { mockLLM } from "./providers/mock.js";
 
 export interface LLMMessage {
   role: string;

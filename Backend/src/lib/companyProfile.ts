@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { prisma } from "../config/prisma.ts";
+import { prisma } from "../config/prisma.js";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
