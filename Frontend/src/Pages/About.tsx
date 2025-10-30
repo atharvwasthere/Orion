@@ -1,5 +1,5 @@
 import { Button } from "@/Components/ui/button";
-import { OrionLogo } from "../Components/logo/orion-logo";
+import OrionLogo from "/logo.png";
 import face from "@/Components/logo/face.svg";
 
 export default function AboutPage() {
@@ -11,9 +11,10 @@ export default function AboutPage() {
           <a
             href="/"
             aria-label="Orion Home"
-            className="flex items-center gap-3"
+            className="flex items-center gap-3 text-xl font-bold "
           >
-            <OrionLogo />
+            <img src={OrionLogo} alt="Orion Logo" className="w-8 h-8" />
+            Orion
           </a>
           <div className="flex items-center gap-8">
             <a

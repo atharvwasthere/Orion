@@ -1,5 +1,5 @@
 import { Button } from "@/Components/ui/button";
-import { OrionLogo } from "@/Components/logo/orion-logo";
+import OrionLogo from "/logo.png";
 import { Link } from "@tanstack/react-router";
 
 export default function Navbar() {
@@ -8,7 +8,7 @@ export default function Navbar() {
       <nav className="mt-2 flex h-12 md:h-14 w-full max-w-7xl items-center justify-between rounded-lg  backdrop-blur-md px-4 transition-all">
         {/* Left Section: Logo + Links */}
         <div className="flex items-center gap-8 ">
-          <OrionLogo className="-mt-2" />
+          <img src={OrionLogo} alt="Orion Logo" className="w-8 h-8 -mt-2" />
           <div className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
             <a
               href="/demo"
