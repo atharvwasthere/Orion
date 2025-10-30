@@ -1,52 +1,45 @@
-import { Button } from "@/Components/ui/button";
+import man from "@/Components/logo/man.svg";
+import { Link } from "@tanstack/react-router";
 
 function CtaSection() {
   return (
-    <>
-      <section className="py-32 bg-background relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px]">
-            <div className="absolute inset-0 bg-primary/5 rounded-full blur-3xl animate-pulse-glow" />
-          </div>
+    <section className="relative flex flex-col items-center justify-center py-32 bg-gradient-to-b from-background via-background/80 to-muted/30 overflow-hidden">
+      {/* Subtle ambient glow */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl animate-pulse-slow" />
+      </div>
+
+      {/* Foreground content */}
+      <div className="relative z-10 mx-auto px-6 text-center">
+        <div className="animate-wiggle-lines mb-10 flex justify-center ">
+            <img
+              src={man}
+              
+              alt="Orion mascot"
+              className="w-24 scale-200 h-24 object-contain drop-shadow-lg "
+            />
         </div>
 
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="mb-8 flex justify-center">
-              <div className="w-20 h-20 relative">
-                <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping" />
-                <div className="relative w-full h-full bg-primary rounded-full flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" fill="none" className="w-10 h-10">
-                    <path
-                      d="M5 12L10 17L20 7"
-                      stroke="white"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
+        {/* Heading */}
+        <h2 className="font-display text-5xl md:text-6xl font-bold mb-4 tracking-tight">
+          Ready to begin?
+        </h2>
 
-            <h2 className="font-display text-5xl md:text-6xl font-bold mb-6 text-balance">
-              Ready to begin?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-10 text-pretty leading-relaxed">
-              Join the waitlist and be among the first to experience AI-powered
-              support automation with Orion.
-            </p>
+        {/* Subtitle */}
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+          Join the waitlist and be among the first to experience
+          <span className="text-primary font-medium"> AI-powered support automation</span> with Orion.
+        </p>
 
-            <Button
-              size="lg"
-              className="text-lg px-12 py-7 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all"
-            >
-              Get early access
-            </Button>
-          </div>
-        </div>
-      </section>
-    </>
+        {/* CTA Button */}
+        <Link
+          to="/dashboard/setup"
+          className="text-lg px-10 py-6 rounded-xs bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/30 hover:scale-105 transition-transform"
+        >
+          Get early access
+        </Link>
+      </div>
+    </section>
   );
 }
 

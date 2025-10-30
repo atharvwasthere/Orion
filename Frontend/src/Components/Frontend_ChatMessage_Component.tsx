@@ -138,7 +138,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
         </div>
 
         {/* Debug: Context used (only show if available and in dev mode) */}
-        {process.env.NODE_ENV === 'development' && meta.contextUsed && meta.contextUsed.length > 0 && (
+        {import.meta.env.DEV && meta.contextUsed && meta.contextUsed.length > 0 && (
           <details className="text-xs text-muted-foreground mt-2">
             <summary className="cursor-pointer font-medium">Context Used ({meta.contextUsed.length})</summary>
             <ul className="mt-1 pl-4 list-disc">

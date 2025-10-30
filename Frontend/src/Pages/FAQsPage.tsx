@@ -1,5 +1,5 @@
 import { useState, useRef } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card"
+import { Card, CardContent } from "@/Components/ui/card"
 import { Button } from "@/Components/ui/button"
 import { Input } from "@/Components/ui/input"
 import { Label } from "@/Components/ui/label"
@@ -115,7 +115,6 @@ export default function FAQsPage() {
       } else if (file.name.endsWith('.csv')) {
         // Simple CSV parser (question,answer,tags)
         const lines = text.split('\n').filter(l => l.trim());
-        const headers = lines[0].split(',').map(h => h.trim());
         data = lines.slice(1).map(line => {
           const values = line.split(',').map(v => v.trim());
           return {

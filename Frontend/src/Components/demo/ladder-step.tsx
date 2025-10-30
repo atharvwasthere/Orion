@@ -3,7 +3,7 @@ import { useInView } from "framer-motion"
 import { useRef } from "react"
 
 interface LadderStepProps {
-  icon: string
+  icon: string | React.ReactNode
   title: string
   description: string
   index: number
@@ -39,7 +39,11 @@ export function LadderStep({ icon, title, description, index }: LadderStepProps)
         transition={{ duration: 0.4, delay: index * 0.15 + 0.3 }}
         className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-3xl shadow-lg shadow-primary/20"
       >
-        {icon}
+        {typeof icon === 'string' ? (
+          <img src={icon} alt="" className="w-8 h-8" />
+        ) : (
+          icon
+        )}
       </motion.div>
 
       {/* Content */}

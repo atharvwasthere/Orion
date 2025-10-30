@@ -2,33 +2,35 @@ import { LadderStep } from "@/Components/demo/ladder-step";
 import { ExpandableChat } from "@/Components/demo/chat";
 import { DemoNav } from "@/Components/demo/demo-nav";
 import { motion } from "framer-motion";
+import notebook from "@/Components/logo/notebook.svg";
+import escalate from "@/Components/logo/escalate.svg";
+import brain from "@/Components/logo/brain.svg";
+import generate from "@/Components/logo/generate.svg";
+
 
 const steps = [
   {
-    icon: "📄",
+    icon: notebook,
     title: "Ingest Knowledge",
-    description:
-      "Your FAQs and docs become structured knowledge stored in Orion's database.",
+    description: "Your FAQs and docs become structured knowledge stored in Orion's database.",
   },
   {
-    icon: "🧠",
+    icon: brain,
     title: "Understand Context",
-    description:
-      "Each user message updates Orion's memory — so it recalls details naturally.",
+    description: "Each user message updates Orion's memory — so it recalls details naturally.",
   },
   {
-    icon: "⚡",
+    icon: generate,
     title: "Generate Responses",
-    description:
-      "Gemini processes context and data to craft brand-aligned answers.",
+    description: "Gemini processes context and data to craft brand-aligned answers.",
   },
   {
-    icon: "🧩",
+    icon: escalate,
     title: "Escalate When Needed",
-    description:
-      "If confidence drops, Orion flags the issue and escalates it automatically.",
+    description: "If confidence drops, Orion flags the issue and escalates it automatically.",
   },
 ];
+
 
 export default function DemoPage() {
   return (

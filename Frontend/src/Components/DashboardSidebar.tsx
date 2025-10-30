@@ -3,6 +3,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { OrionLogo } from "./logo/orion-logo";
 import { cn } from "@/lib/utils";
 
+
 const navigation = [
   { name: "Home", href: "/dashboard", icon: "home" },
   { name: "FAQ Library", href: "/dashboard/faqs", icon: "book" },
@@ -66,6 +67,15 @@ const icons = {
 export function DashboardSidebar() {
   const { location } = useRouterState();
   const pathname = location.pathname;
+  
+  const getActiveCompanyShortName = () => {
+  const name =
+    localStorage.getItem("companyName") ||
+    localStorage.getItem("activeCompanyName") ||
+    "Acme";
+  return name.split(" ")[0]; // “StellarWorks Inc” → “StellarWorks”
+};
+  
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card">
@@ -112,7 +122,7 @@ export function DashboardSidebar() {
               AS
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">Acme Support</p>
+              <p className="text-sm font-medium truncate">{getActiveCompanyShortName()} Support</p>
               <p className="text-xs text-muted-foreground truncate">Team Admin</p>
             </div>
           </div>

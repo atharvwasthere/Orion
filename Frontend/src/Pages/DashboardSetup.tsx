@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/Components/ui/card";
 import { useNavigate } from "@tanstack/react-router";
 import { ensureCompanyId, createSession } from "@/lib/ensureCompanyId";
 import { apiFetch } from "@/lib/api";
-import { getActiveCompanyName } from "@/lib/companyContext";
 
 type Step = { id: 1 | 2 | 3; title: string; completed: boolean };
 type FaqItem = { question: string; answer: string; tags?: string[] };
@@ -48,7 +47,6 @@ export default function SetupPage() {
 
   const [openStep, setOpenStep] = useState<1 | 2 | 3 | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<string>("");
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [parsedFaqs, setParsedFaqs] = useState<FaqItem[]>([]);
   const [importResults, setImportResults] = useState<FaqResult[]>([]);
   const [importing, setImporting] = useState(false);
@@ -70,8 +68,6 @@ export default function SetupPage() {
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    setUploadedFile(file);
     setParsedFaqs([]);
     setImportResults([]);
 

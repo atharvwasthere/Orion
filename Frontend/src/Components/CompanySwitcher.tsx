@@ -16,8 +16,8 @@ import {
 
 export function CompanySwitcher() {
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(getActiveCompanyId());
-  const [activeName, setActiveName] = useState<string | null>(getActiveCompanyName());
+  const [activeId] = useState<string | null>(getActiveCompanyId());
+  const [activeName] = useState<string | null>(getActiveCompanyName());
   const [loading, setLoading] = useState(true);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [newCompanyName, setNewCompanyName] = useState('');

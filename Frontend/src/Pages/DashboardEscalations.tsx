@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
 import { Loader2, AlertTriangle, CheckCircle2, Clock, ExternalLink } from "lucide-react"
 import { Link } from "@tanstack/react-router"
-import { useEscalations, updateEscalation, getEscalationDetails, type Escalation, type EscalationStatus } from "@/hooks/useEscalations"
+import { useEscalations, updateEscalation, type Escalation, type EscalationStatus } from "@/hooks/useEscalations"
 import { apiFetch } from "@/lib/api"
 import type { Summary } from "@/hooks/useChat"
 

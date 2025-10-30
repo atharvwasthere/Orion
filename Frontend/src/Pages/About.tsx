@@ -1,5 +1,6 @@
-import { Button } from "@/Components/ui/button"
-import { OrionLogo } from "../Components/logo/orion-logo"
+import { Button } from "@/Components/ui/button";
+import { OrionLogo } from "../Components/logo/orion-logo";
+import face from "@/Components/logo/face.svg";
 
 export default function AboutPage() {
   return (
@@ -7,21 +8,36 @@ export default function AboutPage() {
       {/* Top navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/" aria-label="Orion Home" className="flex items-center gap-3">
+          <a
+            href="/"
+            aria-label="Orion Home"
+            className="flex items-center gap-3"
+          >
             <OrionLogo />
           </a>
           <div className="flex items-center gap-8">
-            <a href="/#platform" className="text-sm font-medium hover:text-primary transition-colors">
+            <a
+              href="/#platform"
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
               Platform
             </a>
-            <a aria-current="page" href="/about" className="text-sm font-semibold text-foreground">
+            <a
+              aria-current="page"
+              href="/about"
+              className="text-sm font-semibold text-foreground"
+            >
               About
             </a>
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="sm" asChild>
                 <a href="/dashboard/setup">Login</a>
               </Button>
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium" asChild>
+              <Button
+                size="sm"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+                asChild
+              >
                 <a href="/chat">Get access now</a>
               </Button>
             </div>
@@ -38,6 +54,11 @@ export default function AboutPage() {
             <span className="inline-flex items-center rounded-full border border-border bg-card/60 px-3 py-1 text-xs font-semibold tracking-wide text-foreground/80">
               MANIFESTO
             </span>
+            <img
+              src={face}
+              alt="Orion face"
+              className="w-20 m-8 scale-150 h-20 md:w-28 md:h-28 animate-wiggle-lines"
+            />
             <h1 className="mt-6 font-display text-5xl md:text-7xl font-extrabold tracking-tight text-balance">
               Big intelligence for small teams.
             </h1>
@@ -51,12 +72,15 @@ export default function AboutPage() {
             {/* Supporting intro from the provided text */}
             <div className="mt-8 space-y-6 text-lg md:text-xl leading-relaxed text-pretty max-w-3xl">
               <p>
-                We built Orion because automation was never meant to belong only to billion-dollar enterprises. The
-                future of work shouldn’t be gated behind sales demos, enterprise plans, and bloated dashboards.
+                We built Orion because automation was never meant to belong only
+                to billion-dollar enterprises. The future of work shouldn’t be
+                gated behind sales demos, enterprise plans, and bloated
+                dashboards.
               </p>
               <p>
-                While giants chase scale and shareholder growth, we’re building for the operators, founders, and support
-                teams who still answer customers themselves — the real builders.
+                While giants chase scale and shareholder growth, we’re building
+                for the operators, founders, and support teams who still answer
+                customers themselves — the real builders.
               </p>
             </div>
           </div>
@@ -80,8 +104,8 @@ export default function AboutPage() {
           heading="The truth"
           paragraphs={[
             <span key="truth-1">
-              AI isn’t magic. It’s context. That’s why Orion doesn’t just <em>generate</em> replies — it{" "}
-              <em>understands</em> conversations.
+              AI isn’t magic. It’s context. That’s why Orion doesn’t just{" "}
+              <em>generate</em> replies — it <em>understands</em> conversations.
             </span>,
             "It remembers, reasons, and reacts. It learns from your company’s own FAQs, tone, and history.",
             "It’s built to speak like you, not like a template.",
@@ -123,8 +147,12 @@ export default function AboutPage() {
         <div className="container mx-auto px-6 mt-10">
           <div className="max-w-5xl rounded-2xl border border-border bg-card/60 p-6 md:p-8 flex items-center justify-between gap-6">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Ready to see Orion in action?</p>
-              <h3 className="font-display text-2xl md:text-3xl font-semibold mt-1">Run your support on autopilot.</h3>
+              <p className="text-sm font-medium text-muted-foreground">
+                Ready to see Orion in action?
+              </p>
+              <h3 className="font-display text-2xl md:text-3xl font-semibold mt-1">
+                Run your support on autopilot.
+              </h3>
             </div>
             <div className="flex items-center gap-3">
               <Button
@@ -134,7 +162,10 @@ export default function AboutPage() {
               >
                 <a href="/demo">View demo</a>
               </Button>
-              <Button className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90" asChild>
+              <Button
+                className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                asChild
+              >
                 <a href="/chat">Get access now</a>
               </Button>
             </div>
@@ -142,7 +173,7 @@ export default function AboutPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }
 
 function Section({
@@ -150,19 +181,26 @@ function Section({
   heading,
   paragraphs,
 }: {
-  eyebrow: string
-  heading: string
-  paragraphs: Array<React.ReactNode>
+  eyebrow: string;
+  heading: string;
+  paragraphs: Array<React.ReactNode>;
 }) {
   return (
     <section className="py-12 md:py-16">
       <div className="container mx-auto px-6">
         <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-[240px_1fr] items-start">
           <div className="md:sticky md:top-24">
-            <span className="text-xs font-semibold tracking-wide text-muted-foreground">{eyebrow}</span>
-            <h2 className="mt-2 font-display text-3xl md:text-4xl font-bold">{heading}</h2>
+            <span className="text-xs font-semibold tracking-wide text-muted-foreground">
+              {eyebrow}
+            </span>
+            <h2 className="mt-2 font-display text-3xl md:text-4xl font-bold">
+              {heading}
+            </h2>
             {/* decorative dot with subtle motion */}
-            <div aria-hidden className="mt-4 h-2 w-2 rounded-full bg-primary/50 animate-float" />
+            <div
+              aria-hidden
+              className="mt-4 h-2 w-2 rounded-full bg-primary/50 animate-float"
+            />
           </div>
           <div className="rounded-2xl border border-border bg-card/60 p-6 md:p-8 shadow-sm">
             <div className="space-y-5 text-[15px] leading-relaxed text-pretty">
@@ -174,5 +212,5 @@ function Section({
         </div>
       </div>
     </section>
-  )
+  );
 }

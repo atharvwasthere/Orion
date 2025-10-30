@@ -82,7 +82,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-extrabold tracking-tight">Mission Control</h1>
+          <h1 className="font-display text-3xl font-extrabold tracking-tight">Orion HQ</h1>
           <p className="mt-1 text-sm text-muted-foreground">Real-time assistant health and traffic.</p>
         </div>
         <Link to="/chat" aria-label="Open preview chat">

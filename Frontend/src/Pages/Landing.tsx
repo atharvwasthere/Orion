@@ -7,6 +7,7 @@ import DashboardPreview from "@/Components/DashboardPreview";
 import { TrustedBy } from "@/Components/TrustedBy";
 import MeetOrion from "@/Components/MeetOrion";
 import MarketingFeatureBands from "@/Components/MarketingFeatureBands";
+import DashboardSetup from "@/Components/images/dashboard-setup.png";
 
 export default function Landing() {
   return (
@@ -14,6 +15,11 @@ export default function Landing() {
       <div className="min-h-screen w-full flex flex-col bg-background text-foreground overflow-x-hidden">
         <Navbar />
         <Hero />
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="p-8 shadow-2xl rounded-2xl w-6xl text-shadow-yellow-400 ">
+            <img src={DashboardSetup} alt="Dashboard Setup" />
+          </div>
+        </div>
         <TrustedBy />
         <MeetOrion />
         <MarketingFeatureBands />

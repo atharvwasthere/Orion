@@ -1,7 +1,9 @@
+import type { ReactNode } from "react"
+
 type FeatureItem = {
   title?: string
   description: string
-  icon?: string // path to imported SVG
+  icon?: string | ReactNode
 }
 
 type FeatureBandProps = {
@@ -45,11 +47,15 @@ export function FeatureBand({ id, headline, items, className }: FeatureBandProps
                 <li key={i} className="max-w-xs">
                   <div className="mb-4 h-10 w-10 select-none">
                     {item.icon ? (
-                      <img
-                        src={item.icon}
-                        alt={item.title || `feature-${i}`}
-                        className="h-10 w-10"
-                      />
+                      typeof item.icon === 'string' ? (
+                        <img
+                          src={item.icon}
+                          alt={item.title || `feature-${i}`}
+                          className="h-10 w-10"
+                        />
+                      ) : (
+                        item.icon
+                      )
                     ) : (
                       <DefaultGlyph idx={i} />
                     )}
