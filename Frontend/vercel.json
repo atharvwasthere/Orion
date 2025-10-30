@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "vite.config.*",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "framework": "vite",
+  "env": {
+    "VITE_API_BASE": "https://orion-backend-htgnbwbyachxgxbb.centralindia-01.azurewebsites.net/api/v1/"
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
