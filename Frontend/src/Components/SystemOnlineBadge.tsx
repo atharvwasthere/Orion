@@ -1,7 +1,7 @@
 import { useSystemOnline } from "@/hooks/useSystemOnline";
 
 export function SystemOnlineBadge() {
-  const { status, online, checking, refresh } = useSystemOnline();
+  const { online, checking, refresh } = useSystemOnline();
 
   const label = checking ? "Checking..." : online ? "Online" : "Offline";
   const colorClass = checking
