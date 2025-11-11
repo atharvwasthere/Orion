@@ -1,8 +1,10 @@
 // src/Components/DashboardSidebar.tsx
+import React, { useEffect, useRef } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { OrionLogo } from "./logo/orion-logo";
 import { cn } from "@/lib/utils";
-
+import { useSidebar } from "./SidebarContext";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 const navigation = [
   { name: "Home", href: "/dashboard", icon: "home" },
@@ -64,70 +66,237 @@ const icons = {
   ),
 };
 
-export function DashboardSidebar() {
-  const { location } = useRouterState();
-  const pathname = location.pathname;
-  
-  const getActiveCompanyShortName = () => {
+function getActiveCompanyShortName() {
   const name =
     localStorage.getItem("companyName") ||
     localStorage.getItem("activeCompanyName") ||
     "Acme";
-  return name.split(" ")[0]; // “StellarWorks Inc” → “StellarWorks”
-};
-  
+  return name.split(" ")[0];
+}
+
+/**
+ * Shared sidebar content component used by both desktop and mobile variants
+ */
+function SidebarContent() {
+  const { location } = useRouterState();
+  const pathname = location.pathname;
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card">
-      <div className="flex h-full flex-col">
-        {/* Logo */}
-        <div className="flex h-16 items-center border-b border-border px-6">
-          <OrionLogo />
-        </div>
+    <div className="flex h-full flex-col">
+      {/* Logo */}
+      <div className="flex h-16 items-center border-b border-border px-6">
+        <OrionLogo />
+      </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 space-y-1 p-4">
-          {navigation.map((item) => {
-            const isActive =
-              pathname === item.href || pathname.startsWith(item.href + "/");
-            return (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
+      {/* Navigation */}
+      <nav className="flex-1 space-y-1 p-4">
+        {navigation.map((item) => {
+          const isActive =
+            pathname === item.href || pathname.startsWith(item.href + "/");
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                isActive
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  {icons[item.icon as keyof typeof icons]}
-                </svg>
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
+                {icons[item.icon as keyof typeof icons]}
+              </svg>
+              {item.name}
+            </Link>
+          );
+        })}
+      </nav>
 
-        {/* User Section */}
-        <div className="border-t border-border p-4">
-          <div className="flex items-center gap-3 rounded-lg bg-muted p-3">
-            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-semibold text-primary">
-              AS
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{getActiveCompanyShortName()} Support</p>
-              <p className="text-xs text-muted-foreground truncate">Team Admin</p>
-            </div>
+      {/* User Section */}
+      <div className="border-t border-border p-4">
+        <div className="flex items-center gap-3 rounded-lg bg-muted p-3">
+          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-semibold text-primary">
+            AS
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">
+              {getActiveCompanyShortName()} Support
+            </p>
+            <p className="text-xs text-muted-foreground truncate">Team Admin</p>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Desktop-only sidebar, hidden below lg breakpoint
+ */
+export function DesktopNav() {
+  return (
+    <aside
+      className="hidden lg:block fixed left-0 top-0 z-40 h-screen w-60 border-r border-border bg-card"
+      role="navigation"
+      aria-label="Primary"
+    >
+      <SidebarContent />
     </aside>
   );
+}
+
+/**
+ * Helper to get focusable elements for focus trap
+ */
+function getFocusable(container: HTMLElement | null) {
+  if (!container) return [] as HTMLElement[];
+  const focusableSelectors = [
+    "a[href]",
+    "area[href]",
+    "button:not([disabled])",
+    "input:not([disabled])",
+    "select:not([disabled])",
+    "textarea:not([disabled])",
+    "iframe",
+    "audio[controls]",
+    "video[controls]",
+    "[contenteditable]",
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(",");
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(focusableSelectors)
+  ).filter(
+    (el) => !el.hasAttribute("disabled") && !el.getAttribute("aria-hidden")
+  );
+}
+
+/**
+ * Mobile drawer sidebar, shown below lg breakpoint
+ * Closes on overlay click, Escape, and route change
+ * Traps focus and restores to trigger on close
+ */
+export function MobileDrawer() {
+  const { isOpen, close, triggerRef } = useSidebar();
+  const { location } = useRouterState();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const panelRef = useRef<HTMLElement | null>(null);
+  useLockBodyScroll(isOpen);
+
+  // Close on Esc
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        close();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, close]);
+
+  // Trap focus when open
+  useEffect(() => {
+    if (!isOpen) return;
+    const panel = panelRef.current;
+    const focusables = getFocusable(panel || null);
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      if (!first || !last) return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    // Move initial focus inside
+    (first || panel)?.focus?.();
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
+  // Close on overlay click
+  const onOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === containerRef.current) {
+      close();
+    }
+  };
+
+  // Close on route change
+  useEffect(() => {
+    if (!isOpen) return;
+    close();
+  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Restore focus to the trigger when closing
+  useEffect(() => {
+    if (!isOpen) {
+      const id = requestAnimationFrame(() => triggerRef.current?.focus?.());
+      return () => cancelAnimationFrame(id);
+    }
+  }, [isOpen, triggerRef]);
+
+  // Close on history navigation
+  useEffect(() => {
+    const handler = () => close();
+    window.addEventListener("popstate", handler);
+    return () => window.removeEventListener("popstate", handler);
+  }, [close]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      ref={containerRef}
+      onMouseDown={onOverlayClick}
+      className="fixed inset-0 z-50 lg:hidden"
+      aria-hidden={!isOpen}
+    >
+      {/* Overlay */}
+      <div
+        className={[
+          "fixed inset-0 bg-black/40 transition-opacity duration-200",
+          isOpen ? "opacity-100" : "opacity-0",
+        ].join(" ")}
+      />
+      {/* Drawer panel */}
+      <aside
+        id="mobile-sidebar"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Sidebar"
+        tabIndex={-1}
+        ref={panelRef as any}
+        className={[
+          "fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw]",
+          "bg-card shadow-xl outline-none",
+          "transform transition-transform duration-200 ease-out",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+        ].join(" ")}
+      >
+        <div className="h-full overflow-y-auto">
+          <SidebarContent />
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+// Legacy default export for backwards compatibility
+export function DashboardSidebar() {
+  return <DesktopNav />;
 }
