@@ -6,11 +6,12 @@ import { generate } from "../../llm/adapter.js";
 import {
   updateSessionConfidence,
   shouldEscalateLowConfidence,
+  shouldEscalateSession,
   updateOOSStreak,
   isOOS,
 } from "../../services/confidence.js";
 import { deriveUserFeedback, detectRepeatQuestion } from "../../services/helpers.js";
-import { faqRetrievalScore, cheapOOSClassifier } from "../../services/retrieval.js";
+import { cheapOOSClassifier } from "../../services/retrieval.js";
 import { shouldGenerateSummary, updateSessionSummary } from "../../services/summary.js";
 import { getHybridContext, formatHybridContext } from "../../services/hybridContext.js";
 import { generateStructured } from "../../llm/structuredGenerate.js";
@@ -127,6 +128,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     // Phase 3: LLM Orchestration - Generate intelligent response if sender is user
     let botMsg: Message | null = null;
     let shouldEscalate = false;
+    let retrieval_score = 0;
 
     if (sender === "user") {
       // 2️ Fetch context (recent messages + hybrid context)
@@ -217,11 +219,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         model_conf = response.confidence;
       }
 
-      //  Phase 3.5: Compute retrieval score
-      const retrieval_score = await faqRetrievalScore(
-        sessionWithContext.company.id,
-        text
-      );
+      //  Phase 3.5: Retrieval grounding score — reuse the Gemini-embedding cosine
+      //  similarity already computed by getHybridContext (top-matching FAQ). Semantic,
+      //  not lexical; no extra DB read or embed pass.
+      retrieval_score = hybridContext.topFAQs[0]?.score ?? 0;
 
       //  Phase 3.5: Optional OOS classifier
       const prob_oos = cheapOOSClassifier(text);
@@ -275,6 +276,16 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         process.env
       );
 
+      //  Phase 3.5: Sustained low-confidence check — the smoothed session meter now
+      //  actually gates a hand-off (after a warm-up of SESSION_MIN_TURNS turns).
+      if (
+        !shouldEscalate &&
+        shouldEscalateSession(sessionConfidence, sessionWithContext.messages.length, process.env)
+      ) {
+        shouldEscalate = true;
+        escalationReason = 'low_confidence';
+      }
+
       //  Logging for observability
       console.log({
         route: 'POST /messages',
@@ -291,8 +302,12 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       });
 
       // 5️ Update session with confidence tracking and escalation
+      // Record per-turn confidence into the rolling history (keep last 10)
+      const confHistory = [...(session.confidences ?? []), model_conf ?? 0].slice(-10);
+
       const updateData: any = {
         sessionConfidence,
+        confidences: confHistory,
         status: shouldEscalate ? 'escalated' : 'active',
         escalationReason: shouldEscalate ? escalationReason : null,
         oosStreak: oosTrip ? 0 : newOOS,
@@ -367,7 +382,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         reply: botMsg.text,
         confidence: botMsg.confidence,
         sessionConfidence: updatedSession?.sessionConfidence,
-        retrievalScore: await faqRetrievalScore(session.companyId, text),
+        retrievalScore: retrieval_score,
         escalationReason: updatedSession?.escalationReason,
       };
     }

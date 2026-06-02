@@ -31,14 +31,16 @@ export function updateSessionConfidence(
   if (s.user_feedback === 'retry') penalty += negFb;
   if (s.repeat_question) penalty += reask;
   if (mc != null && mc < lowStart) penalty += (lowStart - mc);
-  // Hallucination: confident answer but poor retrieval grounding
-  if (mc != null && mc >= 0.70 && r < 0.20) penalty += oHall;
+  // Hallucination: confident answer but poor retrieval grounding.
+  // Retrieval is now embedding cosine similarity (unrelated text floors ~0.3-0.4),
+  // so the "ungrounded" cutoff is 0.40, not the old lexical-Jaccard 0.20.
+  if (mc != null && mc >= 0.70 && r < 0.40) penalty += oHall;
 
   // Calculate boosts
   let boost = 0;
   if (s.user_feedback === 'helpful') boost += helpful;
-  // Well-grounded response
-  if (mc != null && mc >= 0.75 && r >= 0.60) boost += grounded;
+  // Well-grounded response (cosine: strong matches sit ~0.7-0.85)
+  if (mc != null && mc >= 0.75 && r >= 0.70) boost += grounded;
   if (boost > maxBoost) boost = maxBoost;
 
   // Apply penalty/boost to previous confidence
@@ -70,8 +72,25 @@ export function updateOOSStreak(
   retrieval_score: number | null,
   env: NodeJS.ProcessEnv
 ) {
-  const TH = parseFloat(env.OOS_THRESHOLD ?? '0.25');
+  // Embedding cosine: a related FAQ scores ~0.6+, unrelated text ~0.3-0.45,
+  // so the out-of-scope cutoff is 0.45 (was 0.25 when retrieval was lexical Jaccard).
+  const TH = parseFloat(env.OOS_THRESHOLD ?? '0.45');
   return (retrieval_score ?? 0) < TH ? prev + 1 : 0;
+}
+
+/**
+ * Sustained low-confidence escalation gate.
+ * Gates on the EWMA-smoothed session confidence meter (so it reacts to a trend,
+ * not a single bad turn) after a warm-up of SESSION_MIN_TURNS turns.
+ */
+export function shouldEscalateSession(
+  sessionConfidence: number,
+  turnCount: number,
+  env: NodeJS.ProcessEnv
+) {
+  const floor = parseFloat(env.SESSION_CONF_FLOOR ?? '0.35');
+  const minTurns = parseInt(env.SESSION_MIN_TURNS ?? '3', 10);
+  return turnCount >= minTurns && sessionConfidence < floor;
 }
 
 /**

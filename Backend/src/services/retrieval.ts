@@ -1,50 +1,8 @@
-import { prisma as db } from '../config/prisma.js';
-import { jaccard } from './helpers.js';
-
 /**
- * Calculate retrieval score for a user query against company FAQs
- * Returns a score between 0 and 1 indicating how well the query matches available FAQs
- * 
- * This is a simple lexical matching approach. In production, we'd use:
- * - Vector embeddings (cosine similarity)
- * - Semantic search with embedding models
- * - Hybrid search (lexical + semantic)
+ * Retrieval grounding is now computed via Gemini-embedding cosine similarity in
+ * services/hybridContext.ts (getHybridContext → topFAQs[].score), reused directly by
+ * the message route. The former lexical (Jaccard) faqRetrievalScore was removed.
  */
-export async function faqRetrievalScore(
-  companyId: string,
-  userQuery: string
-): Promise<number> {
-  try {
-    // Fetch all FAQs for the company
-    const faqs = await db.fAQ.findMany({
-      where: { companyId },
-      select: { question: true, answer: true }
-    });
-
-    if (faqs.length === 0) {
-      return 0; // No FAQs available
-    }
-
-    const query = userQuery.toLowerCase();
-    let maxScore = 0;
-
-    // Find best matching FAQ using Jaccard similarity
-    for (const faq of faqs) {
-      const qScore = jaccard(query, faq.question.toLowerCase());
-      const aScore = jaccard(query, faq.answer.toLowerCase()) * 0.5; // Answer less weighted
-      
-      const score = Math.max(qScore, aScore);
-      if (score > maxScore) {
-        maxScore = score;
-      }
-    }
-
-    return maxScore;
-  } catch (error) {
-    console.error('FAQ retrieval score error:', error);
-    return 0; // Default to 0 on error
-  }
-}
 
 /**
  * Simple OOS (Out-of-Scope) classifier
